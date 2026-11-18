@@ -33,6 +33,9 @@ internal static class EllipticCurveKeyImport
                 var sequence = Asn1Sequence.GetInstance(Asn1Object.FromByteArray(data));
                 parsed = sequence.Count switch
                 {
+                    2 when sequence[0] is DerInteger && sequence[1] is DerInteger => new RsaKeyParameters(false,
+                        DerInteger.GetInstance(sequence[0]).Value, DerInteger.GetInstance(sequence[1]).Value),
+                    9 when sequence[0] is DerInteger && sequence[1] is DerInteger => ReadPkcs1(data),
                     2 when sequence[0] is Asn1Sequence => PublicKeyFactory.CreateKey(data),
                     >= 3 when sequence[0] is DerInteger && sequence[1] is Asn1Sequence => PrivateKeyFactory.CreateKey(data),
                     3 when sequence[0] is Asn1Sequence => new X509CertificateParser().ReadCertificate(data),
@@ -83,6 +86,12 @@ internal static class EllipticCurveKeyImport
     private static object? ReadSec1(byte[] data)
     {
         using var reader = new StringReader(PemEncoding.WriteString("EC PRIVATE KEY", data));
+        return new PemReader(reader).ReadObject();
+    }
+
+    private static object? ReadPkcs1(byte[] data)
+    {
+        using var reader = new StringReader(PemEncoding.WriteString("RSA PRIVATE KEY", data));
         return new PemReader(reader).ReadObject();
     }
 
