@@ -200,4 +200,23 @@
   <data name="RsaPrivateImportHint" xml:space="preserve"><value>Drop an unencrypted PKCS#8 / PKCS#1 RSA private key (PEM/DER), or paste PEM text.</value></data>
   <data name="KeyLengthBits" xml:space="preserve"><value>Key length (bits)</value></data>
   <data name="GenerateKey" xml:space="preserve"><value>Random key</value></data>
+  <data name="CrcTitle" xml:space="preserve"><value>Cyclic redundancy check (CRC)</value></data>
+  <data name="CrcDescription" xml:space="preserve"><value>Calculate CRCs using standard presets or custom polynomials and parameters.</value></data>
+  <data name="CrcPreset" xml:space="preserve"><value>Preset</value></data>
+  <data name="CrcCustom" xml:space="preserve"><value>Custom</value></data>
+  <data name="CrcWidth" xml:space="preserve"><value>Width (1–64 bits)</value></data>
+  <data name="CrcPolynomial" xml:space="preserve"><value>Polynomial (Hex)</value></data>
+  <data name="CrcInitial" xml:space="preserve"><value>Initial value (Hex)</value></data>
+  <data name="CrcXorOut" xml:space="preserve"><value>Final XOR (Hex)</value></data>
+  <data name="CrcReflectInput" xml:space="preserve"><value>Reflect input (RefIn)</value></data>
+  <data name="CrcReflectOutput" xml:space="preserve"><value>Reflect output (RefOut)</value></data>
+  <data name="CrcCheck" xml:space="preserve"><value>Preset check for 123456789 (Hex)</value></data>
+  <data name="CrcOutputFormat" xml:space="preserve"><value>Output format</value></data>
+  <data name="CrcDecimal" xml:space="preserve"><value>Decimal</value></data>
+  <data name="CrcBinary" xml:space="preserve"><value>Binary</value></data>
+  <data name="CrcBase64" xml:space="preserve"><value>Base64 (big-endian bytes)</value></data>
+  <data name="CrcCalculate" xml:space="preserve"><value>Calculate CRC</value></data>
+  <data name="CrcPolynomialHint" xml:space="preserve"><value>Enter the polynomial in normal Hex notation, omitting the highest x^width term. Reflection is controlled by RefIn/RefOut; editing a parameter switches to Custom.</value></data>
+  <data name="InvalidCrcParameters" xml:space="preserve"><value>Invalid CRC parameters. Width must be 1–64 and all values must fit the width; polynomial must be nonzero.</value></data>
+  <data name="InvalidCrcHex" xml:space="preserve"><value>Enter a hexadecimal value within the selected width (optional 0x prefix).</value></data>
 </root>

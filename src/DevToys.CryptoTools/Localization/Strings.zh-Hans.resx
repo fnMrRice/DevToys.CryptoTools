@@ -200,4 +200,23 @@
   <data name="RsaPrivateImportHint" xml:space="preserve"><value>拖入未加密的 PKCS#8 / PKCS#1 RSA 私钥（PEM/DER），或粘贴 PEM 文本。</value></data>
   <data name="KeyLengthBits" xml:space="preserve"><value>密钥长度（位）</value></data>
   <data name="GenerateKey" xml:space="preserve"><value>随机密钥</value></data>
+  <data name="CrcTitle" xml:space="preserve"><value>循环冗余校验（CRC）</value></data>
+  <data name="CrcDescription" xml:space="preserve"><value>通过常见预设或自定义多项式及参数计算 CRC。</value></data>
+  <data name="CrcPreset" xml:space="preserve"><value>预设</value></data>
+  <data name="CrcCustom" xml:space="preserve"><value>自定义</value></data>
+  <data name="CrcWidth" xml:space="preserve"><value>位宽（1–64 位）</value></data>
+  <data name="CrcPolynomial" xml:space="preserve"><value>多项式（Hex）</value></data>
+  <data name="CrcInitial" xml:space="preserve"><value>初始值（Hex）</value></data>
+  <data name="CrcXorOut" xml:space="preserve"><value>输出异或值（Hex）</value></data>
+  <data name="CrcReflectInput" xml:space="preserve"><value>输入反射（RefIn）</value></data>
+  <data name="CrcReflectOutput" xml:space="preserve"><value>输出反射（RefOut）</value></data>
+  <data name="CrcCheck" xml:space="preserve"><value>预设校验值：123456789（Hex）</value></data>
+  <data name="CrcOutputFormat" xml:space="preserve"><value>输出格式</value></data>
+  <data name="CrcDecimal" xml:space="preserve"><value>十进制</value></data>
+  <data name="CrcBinary" xml:space="preserve"><value>二进制</value></data>
+  <data name="CrcBase64" xml:space="preserve"><value>Base64（大端字节）</value></data>
+  <data name="CrcCalculate" xml:space="preserve"><value>计算 CRC</value></data>
+  <data name="CrcPolynomialHint" xml:space="preserve"><value>多项式使用普通 Hex 表示，省略最高次 x^width 项；反射由 RefIn/RefOut 控制。修改任一参数后切换为自定义。</value></data>
+  <data name="InvalidCrcParameters" xml:space="preserve"><value>CRC 参数无效：位宽须为 1–64，所有数值须在位宽范围内，多项式不能为零。</value></data>
+  <data name="InvalidCrcHex" xml:space="preserve"><value>请输入所选位宽范围内的十六进制值，可带 0x 前缀。</value></data>
 </root>
