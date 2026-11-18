@@ -74,4 +74,106 @@
   <data name="CbcHint" xml:space="preserve"><value>CBC uses a 16-byte IV. Without padding, input must be a multiple of 16 bytes. CBC does not authenticate ciphertext.</value></data>
   <data name="AuthenticatedHint" xml:space="preserve"><value>Uses a 12-byte nonce. The 16-byte authentication tag is appended to the ciphertext.</value></data>
   <data name="UseOutputAsInput" xml:space="preserve"><value>Use output as input</value></data>
+  <data name="InvalidKeyFile" xml:space="preserve"><value>Unsupported or invalid key/certificate file. Use unencrypted PEM or DER.</value></data>
+  <data name="InvalidCoordinates" xml:space="preserve"><value>Invalid public key coordinates for the selected curve.</value></data>
+  <data name="SelectOneFile" xml:space="preserve"><value>Select a single file.</value></data>
+  <data name="FileTooLarge" xml:space="preserve"><value>The file exceeds the 1 MiB import limit.</value></data>
+  <data name="KeyOrCertificate" xml:space="preserve"><value>Key / certificate (PEM)</value></data>
+  <data name="KeyImportHint" xml:space="preserve"><value>Drop a PEM/DER key or X.509 certificate below. Certificates automatically provide their public key.</value></data>
+  <data name="EcEncryptionTitle" xml:space="preserve"><value>Elliptic curve encryption</value></data>
+  <data name="EcEncryptionDescription" xml:space="preserve"><value>ECDH/XDH hybrid encryption and SM2 encryption with key/certificate import.</value></data>
+  <data name="EcSignatureTitle" xml:space="preserve"><value>Elliptic curve signatures</value></data>
+  <data name="EcSignatureDescription" xml:space="preserve"><value>ECDSA, EdDSA and SM2 signatures; verify using keys, certificates or coordinates.</value></data>
+  <data name="EcEncryptHint" xml:space="preserve"><value>Encrypt with a public key or certificate; decrypt with its matching private key. ECDH/XDH output is a JSON envelope.</value></data>
+  <data name="EcSignHint" xml:space="preserve"><value>Sign UTF-8 messages using a private key; verify with a public key or certificate. Signatures are Base64; ECDSA/SM2 use DER.</value></data>
+  <data name="VerificationKeySource" xml:space="preserve"><value>Verification key source</value></data>
+  <data name="KeyFileSource" xml:space="preserve"><value>Key / certificate</value></data>
+  <data name="CoordinateSource" xml:space="preserve"><value>X/Y coordinates (Hex)</value></data>
+  <data name="CoordinateX" xml:space="preserve"><value>Public key X (Hex)</value></data>
+  <data name="CoordinateY" xml:space="preserve"><value>Public key Y (Hex)</value></data>
+  <data name="CoordinateHint" xml:space="preserve"><value>Coordinates apply to ECDSA and SM2 verification. Select key/certificate mode to sign.</value></data>
+  <data name="Back" xml:space="preserve"><value>Back</value></data>
+  <data name="InvalidCertificateOptions" xml:space="preserve"><value>Invalid certificate options.</value></data>
+  <data name="InvalidCsr" xml:space="preserve"><value>Invalid certificate request or CSR signature.</value></data>
+  <data name="KeyPairMismatch" xml:space="preserve"><value>The public key and private key do not match.</value></data>
+  <data name="InvalidIssuer" xml:space="preserve"><value>Invalid issuer certificate or signing key.</value></data>
+  <data name="InvalidSerial" xml:space="preserve"><value>Serial number must be a positive hexadecimal integer of at most 20 bytes.</value></data>
+  <data name="InvalidSan" xml:space="preserve"><value>Invalid subject alternative name.</value></data>
+  <data name="UnsupportedSignatureAlgorithm" xml:space="preserve"><value>Unsupported signature algorithm for this key.</value></data>
+  <data name="InvalidCustomExtension" xml:space="preserve"><value>Invalid custom certificate extension.</value></data>
+  <data name="SendToCsr" xml:space="preserve"><value>Create certificate request</value></data>
+  <data name="NoSigningKey" xml:space="preserve"><value>Generate a signing key pair first.</value></data>
+  <data name="CertPreset" xml:space="preserve"><value>Certificate preset</value></data>
+  <data name="CertGeneral" xml:space="preserve"><value>General</value></data>
+  <data name="CertSubject" xml:space="preserve"><value>Subject</value></data>
+  <data name="CertKeySource" xml:space="preserve"><value>Subject key</value></data>
+  <data name="CertKeySourceHint" xml:space="preserve"><value>Leave empty to generate a new key, or import an existing private key / key pair.</value></data>
+  <data name="CertBasicConstraints" xml:space="preserve"><value>Basic constraints</value></data>
+  <data name="CertSan" xml:space="preserve"><value>Subject alternative names (SAN)</value></data>
+  <data name="CertKeyUsage" xml:space="preserve"><value>Key usage (KU)</value></data>
+  <data name="CertExtendedKeyUsage" xml:space="preserve"><value>Extended key usage (EKU)</value></data>
+  <data name="CertCustomExtensions" xml:space="preserve"><value>Custom extension</value></data>
+  <data name="CertCustom" xml:space="preserve"><value>Custom</value></data>
+  <data name="CertTlsServer" xml:space="preserve"><value>TLS server</value></data>
+  <data name="CertTlsClient" xml:space="preserve"><value>TLS client</value></data>
+  <data name="CertCodeSigning" xml:space="preserve"><value>Code signing</value></data>
+  <data name="CertDocumentSigning" xml:space="preserve"><value>Document / OFD signing</value></data>
+  <data name="CertCertificateAuthority" xml:space="preserve"><value>Certificate authority (CA)</value></data>
+  <data name="CertRsaPss" xml:space="preserve"><value>RSA-PSS signature</value></data>
+  <data name="CertCommonName" xml:space="preserve"><value>Common name (CN)</value></data>
+  <data name="CertOrganization" xml:space="preserve"><value>Organization (O)</value></data>
+  <data name="CertOrganizationalUnit" xml:space="preserve"><value>Organizational unit (OU)</value></data>
+  <data name="CertCountry" xml:space="preserve"><value>Country (C, two letters)</value></data>
+  <data name="CertState" xml:space="preserve"><value>State / province (ST)</value></data>
+  <data name="CertLocality" xml:space="preserve"><value>Locality / city (L)</value></data>
+  <data name="CertSubjectOverride" xml:space="preserve"><value>Full subject DN (optional override)</value></data>
+  <data name="CertNotBefore" xml:space="preserve"><value>Not before (UTC)</value></data>
+  <data name="CertNotAfter" xml:space="preserve"><value>Not after (UTC)</value></data>
+  <data name="CertSerialHex" xml:space="preserve"><value>Serial number (Hex; empty = random)</value></data>
+  <data name="CertIssuerOverride" xml:space="preserve"><value>Issuer DN (optional; must match signing issuer)</value></data>
+  <data name="CertIsCa" xml:space="preserve"><value>Certificate authority (CA)</value></data>
+  <data name="CertPathLength" xml:space="preserve"><value>CA path length (empty = unlimited)</value></data>
+  <data name="CertBasicConstraintsCritical" xml:space="preserve"><value>Basic constraints: critical</value></data>
+  <data name="CertIncludeSan" xml:space="preserve"><value>Include SAN extension</value></data>
+  <data name="CertSanDns" xml:space="preserve"><value>DNS names (comma / newline separated)</value></data>
+  <data name="CertSanIp" xml:space="preserve"><value>IP addresses (comma / newline separated)</value></data>
+  <data name="CertSanEmail" xml:space="preserve"><value>Email addresses (comma / newline separated)</value></data>
+  <data name="CertSanUri" xml:space="preserve"><value>URIs (comma / newline separated)</value></data>
+  <data name="CertSanCritical" xml:space="preserve"><value>SAN: critical</value></data>
+  <data name="CertKeyUsageCritical" xml:space="preserve"><value>Key usage: critical</value></data>
+  <data name="CertDigitalSignature" xml:space="preserve"><value>Digital signature</value></data>
+  <data name="CertNonRepudiation" xml:space="preserve"><value>Content commitment / non-repudiation</value></data>
+  <data name="CertKeyEncipherment" xml:space="preserve"><value>Key encipherment</value></data>
+  <data name="CertDataEncipherment" xml:space="preserve"><value>Data encipherment</value></data>
+  <data name="CertKeyAgreement" xml:space="preserve"><value>Key agreement</value></data>
+  <data name="CertKeyCertSign" xml:space="preserve"><value>Certificate signing</value></data>
+  <data name="CertCrlSign" xml:space="preserve"><value>CRL signing</value></data>
+  <data name="CertEncipherOnly" xml:space="preserve"><value>Encipher only</value></data>
+  <data name="CertDecipherOnly" xml:space="preserve"><value>Decipher only</value></data>
+  <data name="CertEnhancedKeyUsageCritical" xml:space="preserve"><value>Extended key usage: critical</value></data>
+  <data name="CertServerAuth" xml:space="preserve"><value>TLS server authentication</value></data>
+  <data name="CertClientAuth" xml:space="preserve"><value>TLS client authentication</value></data>
+  <data name="CertEmailProtection" xml:space="preserve"><value>Email protection</value></data>
+  <data name="CertIpsecEndSystem" xml:space="preserve"><value>IPsec end system</value></data>
+  <data name="CertIpsecTunnel" xml:space="preserve"><value>IPsec tunnel</value></data>
+  <data name="CertIpsecUser" xml:space="preserve"><value>IPsec user</value></data>
+  <data name="CertTimeStamping" xml:space="preserve"><value>Time stamping</value></data>
+  <data name="CertOcspSigning" xml:space="preserve"><value>OCSP signing</value></data>
+  <data name="CertAnyExtendedUsage" xml:space="preserve"><value>Any extended key usage</value></data>
+  <data name="CertCustomEkuOids" xml:space="preserve"><value>Additional EKU OIDs (comma separated)</value></data>
+  <data name="CertCustomExtensionOid" xml:space="preserve"><value>Extension OID</value></data>
+  <data name="CertCustomExtensionDer" xml:space="preserve"><value>Extension value (Base64 DER)</value></data>
+  <data name="CertCustomExtensionCritical" xml:space="preserve"><value>Custom extension: critical</value></data>
+  <data name="CertInvalidNumber" xml:space="preserve"><value>Enter a valid integer.</value></data>
+  <data name="CertInvalidDate" xml:space="preserve"><value>Enter a valid UTC date and time, e.g. 2026-11-18 08:00:00Z.</value></data>
+  <data name="CertIssuerCertificate" xml:space="preserve"><value>Issuer certificate (PEM)</value></data>
+  <data name="CertUseIssuer" xml:space="preserve"><value>Sign with an issuer CA certificate and private key</value></data>
+  <data name="CertCsrImportHint" xml:space="preserve"><value>Optional: import a PEM / DER CSR and load its subject and SANs before issuing.</value></data>
+  <data name="CertReadCsr" xml:space="preserve"><value>Load CSR fields</value></data>
+  <data name="CertRequestSection" xml:space="preserve"><value>Issue from a certificate request (optional)</value></data>
+  <data name="CsrTitle" xml:space="preserve"><value>Certificate request generator</value></data>
+  <data name="CsrDescription" xml:space="preserve"><value>Generate PKCS#10 certificate requests using new or imported keys.</value></data>
+  <data name="CertIssueCsr" xml:space="preserve"><value>Use CSR to issue certificate</value></data>
+  <data name="CsrBuilderHint" xml:space="preserve"><value>Generate a PKCS#10 CSR with the selected subject, SANs and extensions. The private key stays local.</value></data>
+  <data name="CertGenerateCsrFirst" xml:space="preserve"><value>Generate a CSR before opening certificate issuance.</value></data>
 </root>

@@ -15,8 +15,8 @@ internal sealed record EcEnvelope(int Version, string Algorithm, string Ephemera
 
 internal static class EllipticCurveCryptography
 {
-    internal static readonly string[] SigningAlgorithms = ["ECDSA-P256", "ECDSA-P384", "ECDSA-P521", "Ed25519", "Ed448", "SM2"];
-    internal static readonly string[] EncryptionAlgorithms = ["ECDH-P256", "ECDH-P384", "ECDH-P521", "X25519", "X448", "SM2-C1C3C2", "SM2-C1C2C3"];
+    internal static readonly string[] SigningAlgorithms = [.. EcDomains.Curves.Select(curve => "ECDSA-" + curve), "Ed25519", "Ed448", "SM2"];
+    internal static readonly string[] EncryptionAlgorithms = [.. EcDomains.Curves.Select(curve => "ECDH-" + curve), "X25519", "X448", "SM2-C1C3C2", "SM2-C1C2C3"];
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web);
 
     internal static string Sign(string algorithm, string pem, string text, string sm2Id = "1234567812345678")
@@ -135,16 +135,21 @@ internal static class EllipticCurveCryptography
         return Org.BouncyCastle.Utilities.BigIntegers.AsUnsignedByteArray(ecdh.GetFieldSize(), ecdh.CalculateAgreement(publicKey));
     }
 
-    private static ISigner Signer(string algorithm) => algorithm switch
+    private static ISigner Signer(string algorithm)
     {
-        "ECDSA-P256" => SignerUtilities.GetSigner("SHA256withECDSA"),
-        "ECDSA-P384" => SignerUtilities.GetSigner("SHA384withECDSA"),
-        "ECDSA-P521" => SignerUtilities.GetSigner("SHA512withECDSA"),
-        "Ed25519" => new Ed25519Signer(),
-        "Ed448" => new Ed448Signer([]),
-        "SM2" => new SM2Signer(),
-        _ => throw new ArgumentException(L("InvalidAlgorithm"))
-    };
+        if (algorithm.StartsWith("ECDSA-", StringComparison.Ordinal))
+        {
+            int bits = EcDomains.ForAlgorithm(algorithm).N.BitLength;
+            return SignerUtilities.GetSigner((bits <= 256 ? "SHA256" : bits <= 384 ? "SHA384" : "SHA512") + "withECDSA");
+        }
+        return algorithm switch
+        {
+            "Ed25519" => new Ed25519Signer(),
+            "Ed448" => new Ed448Signer([]),
+            "SM2" => new SM2Signer(),
+            _ => throw new ArgumentException(L("InvalidAlgorithm"))
+        };
+    }
 
     private static SM2Engine Sm2Engine(string algorithm) => new(algorithm == "SM2-C1C3C2" ? SM2Engine.Mode.C1C3C2 : SM2Engine.Mode.C1C2C3);
 
@@ -164,15 +169,8 @@ internal static class EllipticCurveCryptography
 
     private static bool ValidateEcDomain(string algorithm, AsymmetricKeyParameter key)
     {
-        if (key is not ECKeyParameters ec) return false;
-        string? oid = algorithm switch
-        {
-            "ECDSA-P256" or "ECDH-P256" => "1.2.840.10045.3.1.7",
-            "ECDSA-P384" or "ECDH-P384" => "1.3.132.0.34",
-            "ECDSA-P521" or "ECDH-P521" => "1.3.132.0.35",
-            "SM2" or "SM2-C1C3C2" or "SM2-C1C2C3" => "1.2.156.10197.1.301",
-            _ => null
-        };
-        return oid is not null && ec.PublicKeyParamSet?.Id == oid;
+        if (key is not ECKeyParameters ec || !EcDomains.SupportsCoordinates(algorithm)) return false;
+        var expected = EcDomains.ForAlgorithm(algorithm);
+        return ec.Parameters.Equals(expected);
     }
 }

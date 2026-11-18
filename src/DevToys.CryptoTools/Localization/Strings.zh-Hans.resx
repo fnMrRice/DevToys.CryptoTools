@@ -74,4 +74,106 @@
   <data name="CbcHint" xml:space="preserve"><value>CBC 使用 16 字节 IV；无填充时，输入长度必须为 16 字节的整数倍。CBC 不提供密文认证。</value></data>
   <data name="AuthenticatedHint" xml:space="preserve"><value>使用 12 字节 nonce，16 字节认证标签附在密文末尾。</value></data>
   <data name="UseOutputAsInput" xml:space="preserve"><value>输出转为输入</value></data>
+  <data name="InvalidKeyFile" xml:space="preserve"><value>密钥或证书文件无效，请使用未加密的 PEM 或 DER 文件。</value></data>
+  <data name="InvalidCoordinates" xml:space="preserve"><value>公钥坐标无效或不属于所选曲线。</value></data>
+  <data name="SelectOneFile" xml:space="preserve"><value>请选择单个文件。</value></data>
+  <data name="FileTooLarge" xml:space="preserve"><value>文件超过 1 MiB 导入限制。</value></data>
+  <data name="KeyOrCertificate" xml:space="preserve"><value>密钥 / 证书（PEM）</value></data>
+  <data name="KeyImportHint" xml:space="preserve"><value>在下方拖入 PEM/DER 密钥或 X.509 证书，证书会自动提取公钥。</value></data>
+  <data name="EcEncryptionTitle" xml:space="preserve"><value>椭圆曲线加解密</value></data>
+  <data name="EcEncryptionDescription" xml:space="preserve"><value>ECDH/XDH 混合加密、SM2 加解密及密钥/证书导入。</value></data>
+  <data name="EcSignatureTitle" xml:space="preserve"><value>椭圆曲线签名验签</value></data>
+  <data name="EcSignatureDescription" xml:space="preserve"><value>ECDSA、EdDSA、SM2 签名验签，支持密钥、证书或坐标公钥。</value></data>
+  <data name="EcEncryptHint" xml:space="preserve"><value>使用公钥或证书加密、配对私钥解密；ECDH/XDH 输出为 JSON 密文。</value></data>
+  <data name="EcSignHint" xml:space="preserve"><value>使用私钥签名 UTF-8 消息，用公钥或证书验签。签名为 Base64，ECDSA/SM2 使用 DER 格式。</value></data>
+  <data name="VerificationKeySource" xml:space="preserve"><value>验签公钥来源</value></data>
+  <data name="KeyFileSource" xml:space="preserve"><value>密钥 / 证书</value></data>
+  <data name="CoordinateSource" xml:space="preserve"><value>X/Y 坐标（Hex）</value></data>
+  <data name="CoordinateX" xml:space="preserve"><value>公钥 X 坐标（Hex）</value></data>
+  <data name="CoordinateY" xml:space="preserve"><value>公钥 Y 坐标（Hex）</value></data>
+  <data name="CoordinateHint" xml:space="preserve"><value>坐标公钥用于 ECDSA/SM2 验签；签名时请切换到密钥/证书模式。</value></data>
+  <data name="Back" xml:space="preserve"><value>返回</value></data>
+  <data name="InvalidCertificateOptions" xml:space="preserve"><value>证书选项无效。</value></data>
+  <data name="InvalidCsr" xml:space="preserve"><value>证书请求或 CSR 签名无效。</value></data>
+  <data name="KeyPairMismatch" xml:space="preserve"><value>公钥和私钥不匹配。</value></data>
+  <data name="InvalidIssuer" xml:space="preserve"><value>颁发者证书或签名私钥无效。</value></data>
+  <data name="InvalidSerial" xml:space="preserve"><value>序列号必须为不超过 20 字节的正十六进制整数。</value></data>
+  <data name="InvalidSan" xml:space="preserve"><value>主题备用名称无效。</value></data>
+  <data name="UnsupportedSignatureAlgorithm" xml:space="preserve"><value>该密钥不支持所选签名算法。</value></data>
+  <data name="InvalidCustomExtension" xml:space="preserve"><value>自定义证书扩展无效。</value></data>
+  <data name="SendToCsr" xml:space="preserve"><value>生成证书请求</value></data>
+  <data name="NoSigningKey" xml:space="preserve"><value>请先生成可签名的密钥对。</value></data>
+  <data name="CertPreset" xml:space="preserve"><value>证书预设</value></data>
+  <data name="CertGeneral" xml:space="preserve"><value>基本信息</value></data>
+  <data name="CertSubject" xml:space="preserve"><value>主体信息</value></data>
+  <data name="CertKeySource" xml:space="preserve"><value>主体密钥</value></data>
+  <data name="CertKeySourceHint" xml:space="preserve"><value>留空可生成新密钥，也可导入已有私钥或密钥对。</value></data>
+  <data name="CertBasicConstraints" xml:space="preserve"><value>基本约束</value></data>
+  <data name="CertSan" xml:space="preserve"><value>主体备用名称（SAN）</value></data>
+  <data name="CertKeyUsage" xml:space="preserve"><value>密钥用途（KU）</value></data>
+  <data name="CertExtendedKeyUsage" xml:space="preserve"><value>扩展密钥用途（EKU）</value></data>
+  <data name="CertCustomExtensions" xml:space="preserve"><value>自定义扩展</value></data>
+  <data name="CertCustom" xml:space="preserve"><value>自定义</value></data>
+  <data name="CertTlsServer" xml:space="preserve"><value>TLS 服务端</value></data>
+  <data name="CertTlsClient" xml:space="preserve"><value>TLS 客户端</value></data>
+  <data name="CertCodeSigning" xml:space="preserve"><value>代码签名</value></data>
+  <data name="CertDocumentSigning" xml:space="preserve"><value>文档/OFD 签名</value></data>
+  <data name="CertCertificateAuthority" xml:space="preserve"><value>证书颁发机构（CA）</value></data>
+  <data name="CertRsaPss" xml:space="preserve"><value>RSA-PSS 签名</value></data>
+  <data name="CertCommonName" xml:space="preserve"><value>通用名称（CN）</value></data>
+  <data name="CertOrganization" xml:space="preserve"><value>组织（O）</value></data>
+  <data name="CertOrganizationalUnit" xml:space="preserve"><value>组织单位（OU）</value></data>
+  <data name="CertCountry" xml:space="preserve"><value>国家/地区（C，两位代码）</value></data>
+  <data name="CertState" xml:space="preserve"><value>州/省（ST）</value></data>
+  <data name="CertLocality" xml:space="preserve"><value>城市（L）</value></data>
+  <data name="CertSubjectOverride" xml:space="preserve"><value>完整主体 DN（可选，覆盖上方字段）</value></data>
+  <data name="CertNotBefore" xml:space="preserve"><value>生效时间（UTC）</value></data>
+  <data name="CertNotAfter" xml:space="preserve"><value>过期时间（UTC）</value></data>
+  <data name="CertSerialHex" xml:space="preserve"><value>序列号（Hex，留空随机生成）</value></data>
+  <data name="CertIssuerOverride" xml:space="preserve"><value>颁发者 DN（可选，必须与签发者匹配）</value></data>
+  <data name="CertIsCa" xml:space="preserve"><value>证书颁发机构（CA）</value></data>
+  <data name="CertPathLength" xml:space="preserve"><value>CA 路径长度（留空不限制）</value></data>
+  <data name="CertBasicConstraintsCritical" xml:space="preserve"><value>基本约束：关键扩展</value></data>
+  <data name="CertIncludeSan" xml:space="preserve"><value>包含 SAN 扩展</value></data>
+  <data name="CertSanDns" xml:space="preserve"><value>DNS 名称（逗号或换行分隔）</value></data>
+  <data name="CertSanIp" xml:space="preserve"><value>IP 地址（逗号或换行分隔）</value></data>
+  <data name="CertSanEmail" xml:space="preserve"><value>邮箱地址（逗号或换行分隔）</value></data>
+  <data name="CertSanUri" xml:space="preserve"><value>URI（逗号或换行分隔）</value></data>
+  <data name="CertSanCritical" xml:space="preserve"><value>SAN：关键扩展</value></data>
+  <data name="CertKeyUsageCritical" xml:space="preserve"><value>密钥用途：关键扩展</value></data>
+  <data name="CertDigitalSignature" xml:space="preserve"><value>数字签名</value></data>
+  <data name="CertNonRepudiation" xml:space="preserve"><value>内容承诺/不可否认</value></data>
+  <data name="CertKeyEncipherment" xml:space="preserve"><value>密钥加密</value></data>
+  <data name="CertDataEncipherment" xml:space="preserve"><value>数据加密</value></data>
+  <data name="CertKeyAgreement" xml:space="preserve"><value>密钥协商</value></data>
+  <data name="CertKeyCertSign" xml:space="preserve"><value>证书签名</value></data>
+  <data name="CertCrlSign" xml:space="preserve"><value>CRL 签名</value></data>
+  <data name="CertEncipherOnly" xml:space="preserve"><value>仅加密</value></data>
+  <data name="CertDecipherOnly" xml:space="preserve"><value>仅解密</value></data>
+  <data name="CertEnhancedKeyUsageCritical" xml:space="preserve"><value>扩展密钥用途：关键扩展</value></data>
+  <data name="CertServerAuth" xml:space="preserve"><value>TLS 服务端身份认证</value></data>
+  <data name="CertClientAuth" xml:space="preserve"><value>TLS 客户端身份认证</value></data>
+  <data name="CertEmailProtection" xml:space="preserve"><value>电子邮件保护</value></data>
+  <data name="CertIpsecEndSystem" xml:space="preserve"><value>IPsec 终端系统</value></data>
+  <data name="CertIpsecTunnel" xml:space="preserve"><value>IPsec 隧道</value></data>
+  <data name="CertIpsecUser" xml:space="preserve"><value>IPsec 用户</value></data>
+  <data name="CertTimeStamping" xml:space="preserve"><value>时间戳</value></data>
+  <data name="CertOcspSigning" xml:space="preserve"><value>OCSP 签名</value></data>
+  <data name="CertAnyExtendedUsage" xml:space="preserve"><value>任意扩展密钥用途</value></data>
+  <data name="CertCustomEkuOids" xml:space="preserve"><value>其他 EKU OID（逗号分隔）</value></data>
+  <data name="CertCustomExtensionOid" xml:space="preserve"><value>扩展 OID</value></data>
+  <data name="CertCustomExtensionDer" xml:space="preserve"><value>扩展值（Base64 DER）</value></data>
+  <data name="CertCustomExtensionCritical" xml:space="preserve"><value>自定义扩展：关键扩展</value></data>
+  <data name="CertInvalidNumber" xml:space="preserve"><value>请输入有效整数。</value></data>
+  <data name="CertInvalidDate" xml:space="preserve"><value>请输入有效的 UTC 日期时间，例如 2026-11-18 08:00:00Z。</value></data>
+  <data name="CertIssuerCertificate" xml:space="preserve"><value>颁发者证书（PEM）</value></data>
+  <data name="CertUseIssuer" xml:space="preserve"><value>使用颁发者 CA 证书和私钥签发</value></data>
+  <data name="CertCsrImportHint" xml:space="preserve"><value>可选：导入 PEM/DER CSR，加载主体与 SAN 后签发证书。</value></data>
+  <data name="CertReadCsr" xml:space="preserve"><value>加载 CSR 字段</value></data>
+  <data name="CertRequestSection" xml:space="preserve"><value>根据证书请求签发（可选）</value></data>
+  <data name="CsrTitle" xml:space="preserve"><value>证书请求生成</value></data>
+  <data name="CsrDescription" xml:space="preserve"><value>使用新密钥或导入密钥生成 PKCS#10 证书请求。</value></data>
+  <data name="CertIssueCsr" xml:space="preserve"><value>使用 CSR 签发证书</value></data>
+  <data name="CsrBuilderHint" xml:space="preserve"><value>使用所选主体、SAN 和扩展生成 PKCS#10 CSR，私钥保留在本地。</value></data>
+  <data name="CertGenerateCsrFirst" xml:space="preserve"><value>请先生成 CSR，再进入证书签发。</value></data>
 </root>

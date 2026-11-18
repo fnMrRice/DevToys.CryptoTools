@@ -2,8 +2,6 @@ using System.Security.Cryptography;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Asn1;
-using Org.BouncyCastle.Asn1.GM;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
@@ -17,8 +15,8 @@ internal static class KeyGenerator
     internal static readonly string[] Algorithms =
     [
         "RSA-2048", "RSA-3072", "RSA-4096",
-        "ECDSA-P256", "ECDSA-P384", "ECDSA-P521",
-        "ECDH-P256", "ECDH-P384", "ECDH-P521",
+        "ECDSA-P256", "ECDSA-P384", "ECDSA-P521", "ECDSA-secp256k1", "ECDSA-brainpoolP256r1", "ECDSA-brainpoolP384r1", "ECDSA-brainpoolP512r1",
+        "ECDH-P256", "ECDH-P384", "ECDH-P521", "ECDH-secp256k1", "ECDH-brainpoolP256r1", "ECDH-brainpoolP384r1", "ECDH-brainpoolP512r1",
         "Ed25519", "Ed448", "X25519", "X448", "SM2",
         "AES-128", "AES-192", "AES-256", "ChaCha20-256", "SM4-128"
     ];
@@ -31,16 +29,8 @@ internal static class KeyGenerator
             using var rsa = RSA.Create(int.Parse(algorithm[4..], System.Globalization.CultureInfo.InvariantCulture));
             return new(rsa.ExportSubjectPublicKeyInfoPem(), rsa.ExportPkcs8PrivateKeyPem());
         }
-        if (algorithm.StartsWith("ECDSA-", StringComparison.Ordinal))
-        {
-            using var ec = ECDsa.Create(Curve(algorithm));
-            return new(ec.ExportSubjectPublicKeyInfoPem(), ec.ExportPkcs8PrivateKeyPem());
-        }
-        if (algorithm.StartsWith("ECDH-", StringComparison.Ordinal))
-        {
-            using var ec = ECDiffieHellman.Create(Curve(algorithm));
-            return new(ec.ExportSubjectPublicKeyInfoPem(), ec.ExportPkcs8PrivateKeyPem());
-        }
+        if (algorithm.StartsWith("ECDSA-", StringComparison.Ordinal) || algorithm.StartsWith("ECDH-", StringComparison.Ordinal))
+            return Export(GenerateEc(algorithm));
         if (algorithm == "SM2") return Export(GenerateSm2());
         if (algorithm is "Ed25519" or "Ed448" or "X25519" or "X448")
             return Export(GenerateModernCurve(algorithm));
@@ -48,14 +38,6 @@ internal static class KeyGenerator
         int bytes = algorithm switch { "AES-128" or "SM4-128" => 16, "AES-192" => 24, _ => 32 };
         return new(SymmetricKey: Convert.ToBase64String(RandomNumberGenerator.GetBytes(bytes)));
     }
-
-    internal static ECCurve Curve(string algorithm) => algorithm.Split('-')[^1] switch
-    {
-        "P256" => ECCurve.NamedCurves.nistP256,
-        "P384" => ECCurve.NamedCurves.nistP384,
-        "P521" => ECCurve.NamedCurves.nistP521,
-        _ => throw new ArgumentException(L("InvalidAlgorithm"))
-    };
 
     internal static AsymmetricCipherKeyPair GenerateModernCurve(string algorithm)
     {
@@ -70,12 +52,12 @@ internal static class KeyGenerator
         };
     }
 
-    internal static AsymmetricCipherKeyPair GenerateSm2()
+    internal static AsymmetricCipherKeyPair GenerateSm2() => GenerateEc("SM2");
+
+    private static AsymmetricCipherKeyPair GenerateEc(string algorithm)
     {
-        var curve = GMNamedCurves.GetByName("sm2p256v1");
-        var domain = new ECNamedDomainParameters(new DerObjectIdentifier("1.2.156.10197.1.301"), curve);
         var generator = new ECKeyPairGenerator();
-        generator.Init(new ECKeyGenerationParameters(domain, new SecureRandom()));
+        generator.Init(new ECKeyGenerationParameters(EcDomains.ForAlgorithm(algorithm), new SecureRandom()));
         return generator.GenerateKeyPair();
     }
 
