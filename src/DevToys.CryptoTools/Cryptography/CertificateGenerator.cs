@@ -54,7 +54,10 @@ internal static class CertificateGenerator
             return new(PemEncoding.WriteString("CERTIFICATE REQUEST", request.GetDerEncoded()), keys.PrivateKey);
         }
         var generator = new X509V3CertificateGenerator();
-        generator.SetSerialNumber(new BigInteger(1, RandomNumberGenerator.GetBytes(20)).SetBit(0));
+        byte[] serial = RandomNumberGenerator.GetBytes(20);
+        serial[0] &= 0x7f;
+        serial[^1] |= 1;
+        generator.SetSerialNumber(new BigInteger(1, serial));
         generator.SetIssuerDN(name);
         generator.SetSubjectDN(name);
         var now = DateTime.UtcNow;

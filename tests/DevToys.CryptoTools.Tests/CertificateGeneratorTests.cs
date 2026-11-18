@@ -19,6 +19,8 @@ public class CertificateGeneratorTests
         Assert.Equal(cert.SubjectDN, cert.IssuerDN);
         Assert.NotNull(cert.GetSubjectAlternativeNames());
         Assert.Equal(-1, cert.GetBasicConstraints());
+        Assert.InRange(cert.SerialNumber.ToByteArray().Length, 1, 20);
+        Assert.True(cert.SerialNumber.SignValue > 0);
         Assert.InRange((cert.NotAfter - cert.NotBefore).TotalDays, 30, 31);
         Assert.True(KeyGenerator.ReadKey(result.PrivateKey, true).IsPrivate);
         var signer = Org.BouncyCastle.Security.SignerUtilities.GetSigner(cert.SigAlgName);
