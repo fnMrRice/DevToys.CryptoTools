@@ -136,7 +136,7 @@ public class CrcFileInputTests
             await file.OpenRequested.Task.WaitAsync(TimeSpan.FromSeconds(5));
             Find<IUIMultiLineTextInput>(tool, "crc-input").Text("GG");
             await Calculate(tool);
-            status = Assert.IsAssignableFrom<IUIGrid>(tool.View.RootElement).Cells!.Select(cell => cell.Child)
+            status = Assert.IsAssignableFrom<IUIStack>(tool.View.RootElement).Children!
                 .OfType<IUIInfoBar>().Single(bar => bar.IsVisible);
             errorDescription = status.Description;
             Assert.False(string.IsNullOrWhiteSpace(errorDescription));

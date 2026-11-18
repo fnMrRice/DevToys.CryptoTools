@@ -34,7 +34,7 @@ internal sealed class CrcTool : CryptoToolBase, IDisposable
     private readonly IUISingleLineTextInput _output = SingleLineTextInput("crc-output").Title(L("CrcOutputHex")).ReadOnly().ShowCommandBar();
     private readonly IUISingleLineTextInput _expected = SingleLineTextInput("crc-expected").Title(L("CrcExpected")).ShowCommandBar();
     private readonly IUIInfoBar _verification = InfoBar("crc-verification").Title(L("CrcVerification")).Hide();
-    private readonly IUIGrid _layout;
+    private readonly IUIStack _layout;
     private bool _applyingPreset;
     private bool _selectingFile;
     private bool _synchronizingFiles;
@@ -49,7 +49,7 @@ internal sealed class CrcTool : CryptoToolBase, IDisposable
 
     public CrcTool()
     {
-        _input.CommandBarExtraContent(_inputEncoding);
+        _input.CommandBarExtraContent(Stack().Horizontal().SmallSpacing().WithChildren(_inputEncoding, _clearFile));
         _fileSelector.OnFilesSelected(files =>
         {
             if (!_synchronizingFiles)
@@ -84,15 +84,18 @@ internal sealed class CrcTool : CryptoToolBase, IDisposable
                 Parameter("ref-in", "CrcReflectInput", "CrcReflectInputDescription", _reflectInput),
                 Parameter("ref-out", "CrcReflectOutput", "CrcReflectOutputDescription", _reflectOutput),
                 Parameter("check", "CrcCheck", "CrcCheckDescription", _check));
-        var configuration = Stack("crc-configuration").Vertical().SmallSpacing().WithChildren(
+        var configuration = Stack("crc-configuration").Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren(
             Label().Text(L("CrcConfiguration")).Style(UILabelStyle.BodyStrong).AlignHorizontally(UIHorizontalAlignment.Left),
             parameters);
-        var fileInput = Stack().Vertical().SmallSpacing().WithChildren(_fileSelector, _clearFile);
-        var inputs = Grid("crc-inputs").Columns(Fraction(1), Auto, Fraction(1)).ColumnLargeSpacing().Cells(
-            At(0, 0, _input), At(0, 1, Label().Text(L("CrcOr")).AlignVertically(UIVerticalAlignment.Center)), At(0, 2, fileInput));
-        var results = Stack("crc-results").Vertical().SmallSpacing().WithChildren(_output, _expected, _verification);
-        _layout = Grid("crc-layout").Rows(Auto, Auto, Auto, Auto).RowMediumSpacing().Cells(
-            At(0, 0, configuration), At(1, 0, inputs), At(2, 0, results), At(3, 0, Status));
+        var inputs = Grid("crc-inputs").Rows(Fraction(1)).Columns(Fraction(1), Auto, Fraction(1))
+            .ColumnMediumSpacing().AlignVertically(UIVerticalAlignment.Top).Cells(
+                At(0, 0, _input), At(0, 1, Label().Text(L("CrcOr")).AlignVertically(UIVerticalAlignment.Center)), At(0, 2, _fileSelector));
+        var results = Stack("crc-results").Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(_output, _expected, _verification);
+        // A stretched Grid inherits the page height and distributes spare height
+        // among Auto rows. Keep these sections in natural flow, as the host hash tool does.
+        _layout = Stack("crc-layout").Vertical().LargeSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(configuration, inputs, results, Status);
         var defaultPreset = _preset.Items!.First(item => Equals(item.Value, "CRC-32/ISO-HDLC"));
         _preset.Select(defaultPreset);
         ApplyPreset();
