@@ -7,10 +7,12 @@ namespace DevToys.CryptoTools.UI;
 internal abstract class CryptoToolBase : IGuiTool
 {
     private readonly List<IUIElement> _elements = [];
-    private readonly IUIInfoBar _status = InfoBar().Title(L("Status")).Hide();
+    protected IUIInfoBar Status { get; } = InfoBar().Title(L("Status")).Hide();
     private UIToolView? _view;
 
-    public UIToolView View => _view ??= new(Stack().Vertical().MediumSpacing().WithChildren([.. _elements, _status]));
+    protected virtual bool IsScrollable => true;
+    protected virtual IUIElement BuildLayout() => Stack().Vertical().MediumSpacing().WithChildren([.. _elements, Status]);
+    public UIToolView View => _view ??= new(IsScrollable, BuildLayout());
 
     protected T Add<T>(T element) where T : IUIElement
     {
@@ -32,19 +34,24 @@ internal abstract class CryptoToolBase : IGuiTool
 
     protected static string Selected(IUISelectDropDownList choice) => (string)choice.SelectedItem!.Value!;
 
-    protected void ActionButton(string text, Action action) => Add(Button().Text(text).OnClick(() =>
+    protected void ActionButton(string text, Action action) => Add(CreateActionButton(text, action));
+
+    protected IUIButton CreateActionButton(string text, Action action, string? id = null) =>
+        Button(id).Text(text).OnClick(() => Execute(action));
+
+    protected void Execute(Action action)
     {
-        _status.Hide();
+        Status.Hide();
         try
         {
             action();
-            _status.Description(L("Completed")).Success().Show();
+            Status.Description(L("Completed")).Success().Show();
         }
         catch (Exception ex) when (ex is CryptographicException or ArgumentException or FormatException or InvalidOperationException or NotSupportedException or System.Text.Json.JsonException or Org.BouncyCastle.Crypto.CryptoException or System.IO.IOException)
         {
-            _status.Description(ex.Message).Error().Show();
+            Status.Description(ex.Message).Error().Show();
         }
-    }));
+    }
 
     public void OnDataReceived(string dataTypeName, object? parsedData) { }
 }

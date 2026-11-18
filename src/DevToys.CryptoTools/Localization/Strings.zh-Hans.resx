@@ -63,4 +63,15 @@
   <data name="InvalidIvSize" xml:space="preserve"><value>IV / nonce 必须包含 {0} 个字节。</value></data>
   <data name="InvalidPadding" xml:space="preserve"><value>当前模式不支持所选填充。</value></data>
   <data name="InvalidCiphertext" xml:space="preserve"><value>密文必须包含 16 字节的认证标签。</value></data>
+  <data name="Key" xml:space="preserve"><value>密钥</value></data>
+  <data name="Mode" xml:space="preserve"><value>模式</value></data>
+  <data name="BlockPadding" xml:space="preserve"><value>填充</value></data>
+  <data name="NoPadding" xml:space="preserve"><value>无填充</value></data>
+  <data name="Utf8Text" xml:space="preserve"><value>文本（UTF-8）</value></data>
+  <data name="GenerateIv" xml:space="preserve"><value>随机 IV</value></data>
+  <data name="IvTitle" xml:space="preserve"><value>IV / nonce（{0} 字节）</value></data>
+  <data name="IvHint" xml:space="preserve"><value>留空时，加密会自动生成。</value></data>
+  <data name="CbcHint" xml:space="preserve"><value>CBC 使用 16 字节 IV；无填充时，输入长度必须为 16 字节的整数倍。CBC 不提供密文认证。</value></data>
+  <data name="AuthenticatedHint" xml:space="preserve"><value>使用 12 字节 nonce，16 字节认证标签附在密文末尾。</value></data>
+  <data name="UseOutputAsInput" xml:space="preserve"><value>输出转为输入</value></data>
 </root>

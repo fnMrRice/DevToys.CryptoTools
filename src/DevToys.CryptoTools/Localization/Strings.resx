@@ -63,4 +63,15 @@
   <data name="InvalidIvSize" xml:space="preserve"><value>IV / nonce must contain {0} bytes.</value></data>
   <data name="InvalidPadding" xml:space="preserve"><value>Padding is not supported for the selected mode.</value></data>
   <data name="InvalidCiphertext" xml:space="preserve"><value>Ciphertext must include a 16-byte authentication tag.</value></data>
+  <data name="Key" xml:space="preserve"><value>Key</value></data>
+  <data name="Mode" xml:space="preserve"><value>Mode</value></data>
+  <data name="BlockPadding" xml:space="preserve"><value>Padding</value></data>
+  <data name="NoPadding" xml:space="preserve"><value>None</value></data>
+  <data name="Utf8Text" xml:space="preserve"><value>Text (UTF-8)</value></data>
+  <data name="GenerateIv" xml:space="preserve"><value>Random IV</value></data>
+  <data name="IvTitle" xml:space="preserve"><value>IV / nonce ({0} bytes)</value></data>
+  <data name="IvHint" xml:space="preserve"><value>Leave blank to generate on encryption.</value></data>
+  <data name="CbcHint" xml:space="preserve"><value>CBC uses a 16-byte IV. Without padding, input must be a multiple of 16 bytes. CBC does not authenticate ciphertext.</value></data>
+  <data name="AuthenticatedHint" xml:space="preserve"><value>Uses a 12-byte nonce. The 16-byte authentication tag is appended to the ciphertext.</value></data>
+  <data name="UseOutputAsInput" xml:space="preserve"><value>Use output as input</value></data>
 </root>

@@ -22,9 +22,7 @@ public class PluginTests
         foreach (var tool in tools)
         {
             Assert.Same(tool.View, tool.View);
-            var root = Assert.IsAssignableFrom<IUIStack>(tool.View.RootElement);
-            Assert.NotNull(root.Children);
-            Assert.NotEmpty(root.Children);
+            Assert.IsAssignableFrom<IUIElementWithChildren>(tool.View.RootElement);
             var metadata = tool.GetType().GetCustomAttribute<ToolDisplayInformationAttribute>()!;
             string expected = tool is KeyGeneratorTool or CertificateGeneratorTool
                 ? PredefinedCommonToolGroupNames.Generators : CryptographyToolGroup.GroupName;
