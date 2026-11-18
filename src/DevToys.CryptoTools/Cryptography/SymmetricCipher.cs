@@ -1,4 +1,7 @@
 using System.Security.Cryptography;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 
@@ -6,70 +9,125 @@ namespace DevToys.CryptoTools.Cryptography;
 
 internal static class SymmetricCipher
 {
-    internal static int IvLength(string algorithm) => algorithm switch
-    {
-        "AES-CBC" or "SM4-CBC" => 16,
-        "AES-GCM" or "SM4-GCM" or "ChaCha20-Poly1305" => 12,
-        _ => throw new ArgumentException(L("InvalidAlgorithm"))
-    };
+    internal static int IvLength(string algorithm) => SymmetricAlgorithmCatalog.IvLength(algorithm);
 
-    // Authenticated modes return ciphertext followed by the 16-byte authentication tag.
+    // Authenticated ciphertext includes its authentication tag at the end.
     internal static byte[] Transform(bool encrypt, string algorithm, byte[] key, byte[] iv, byte[] input,
         PaddingMode padding = PaddingMode.None, byte[]? associatedData = null)
     {
-        Validate(algorithm, key, iv, padding);
-        if (algorithm.EndsWith("-CBC", StringComparison.Ordinal))
+        var specification = SymmetricAlgorithmCatalog.Resolve(algorithm);
+        Validate(algorithm, key, iv, input, padding, encrypt, associatedData);
+        if (specification.BlockSize == 0)
+            return StreamTransform(encrypt, specification, key, iv, input, associatedData);
+
+        string engineName = specification.Algorithm == "TripleDES" ? "DESEDE" : specification.Algorithm;
+        if (SymmetricAlgorithmCatalog.TagLength(algorithm) > 0)
         {
-            if (algorithm == "AES-CBC")
-            {
-                using var aes = Aes.Create();
-                aes.Key = key;
-                return encrypt ? aes.EncryptCbc(input, iv, padding) : aes.DecryptCbc(input, iv, padding);
-            }
-            var cipher = CipherUtilities.GetCipher("SM4/CBC/" + (padding == PaddingMode.PKCS7 ? "PKCS7Padding" : "NoPadding"));
-            cipher.Init(encrypt, new ParametersWithIV(new KeyParameter(key), iv));
+            var cipher = CipherUtilities.GetCipher(engineName + "/" + specification.Mode + "/NoPadding");
+            cipher.Init(encrypt, new AeadParameters(new KeyParameter(key), SymmetricAlgorithmCatalog.TagLength(algorithm) * 8, iv, associatedData));
             return cipher.DoFinal(input);
         }
 
-        if (!encrypt && input.Length < 16) throw new ArgumentException(L("InvalidCiphertext"));
-        if (algorithm == "SM4-GCM")
+        byte[] workingInput = input;
+        bool padded = specification.Mode is "ECB" or "CBC";
+        if (encrypt && padded && padding != PaddingMode.None) workingInput = AddPadding(input, specification.BlockSize, padding);
+        try
         {
-            var cipher = CipherUtilities.GetCipher("SM4/GCM/NoPadding");
+            string modeName = specification.Mode == "CFB" ? "CFB" + specification.BlockSize * 8 : specification.Mode;
+            var cipher = CipherUtilities.GetCipher(engineName + "/" + modeName + "/NoPadding");
+            ICipherParameters parameters = new KeyParameter(key);
+            if (iv.Length > 0) parameters = new ParametersWithIV(parameters, iv);
+            cipher.Init(encrypt, parameters);
+            byte[] result = cipher.DoFinal(workingInput);
+            return !encrypt && padded && padding != PaddingMode.None ? RemovePadding(result, specification.BlockSize, padding) : result;
+        }
+        finally { if (!ReferenceEquals(workingInput, input)) CryptographicOperations.ZeroMemory(workingInput); }
+    }
+
+    private static byte[] StreamTransform(bool encrypt, SymmetricAlgorithm algorithm, byte[] key, byte[] iv, byte[] input, byte[]? associatedData)
+    {
+        if (algorithm.Mode == "Poly1305")
+        {
+            IAeadCipher cipher = algorithm.Algorithm == "XChaCha20" ? new XChaCha20Poly1305() : new Org.BouncyCastle.Crypto.Modes.ChaCha20Poly1305();
             cipher.Init(encrypt, new AeadParameters(new KeyParameter(key), 128, iv, associatedData));
-            return cipher.DoFinal(input);
+            byte[] output = new byte[cipher.GetOutputSize(input.Length)];
+            int written = cipher.ProcessBytes(input, 0, input.Length, output, 0);
+            written += cipher.DoFinal(output, written);
+            return output[..written];
         }
+        IStreamCipher stream = algorithm.Algorithm switch
+        {
+            "ChaCha20" => new ChaCha7539Engine(),
+            "XChaCha20" => new XChaCha20Engine(),
+            "Salsa20" => new Salsa20Engine(),
+            "XSalsa20" => new XSalsa20Engine(),
+            _ => throw new ArgumentException(L("InvalidAlgorithm"))
+        };
+        stream.Init(encrypt, new ParametersWithIV(new KeyParameter(key), iv));
+        byte[] result = new byte[input.Length];
+        stream.ProcessBytes(input, 0, input.Length, result, 0);
+        return result;
+    }
 
-        byte[] output = new byte[encrypt ? input.Length + 16 : input.Length - 16];
-        ReadOnlySpan<byte> ciphertext = encrypt ? default : input.AsSpan(0, input.Length - 16);
-        ReadOnlySpan<byte> tag = encrypt ? default : input.AsSpan(input.Length - 16);
-        if (algorithm == "AES-GCM")
+    private static void Validate(string algorithm, byte[] key, byte[] iv, byte[] input, PaddingMode padding, bool encrypt, byte[]? associatedData)
+    {
+        var specification = SymmetricAlgorithmCatalog.Resolve(algorithm);
+        int length = IvLength(algorithm);
+        if (!SymmetricAlgorithmCatalog.IsKeyLengthValid(algorithm, key.Length)) throw new ArgumentException(L("InvalidKeySize"));
+        if (iv.Length != length) throw new ArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, L("InvalidIvSize"), length));
+        if (!SymmetricAlgorithmCatalog.PaddingNames(algorithm).Contains(padding.ToString())) throw new ArgumentException(L("InvalidPadding"));
+        int tagLength = SymmetricAlgorithmCatalog.TagLength(algorithm);
+        if (!encrypt && input.Length < tagLength) throw new ArgumentException(L("InvalidCiphertext"));
+        if (tagLength == 0 && associatedData is { Length: > 0 }) throw new ArgumentException(L("UnsupportedAssociatedData"));
+        if (specification.Mode is "ECB" or "CBC")
         {
-            using var aes = new AesGcm(key, 16);
-            if (encrypt) aes.Encrypt(iv, input, output.AsSpan(0, input.Length), output.AsSpan(input.Length), associatedData);
-            else aes.Decrypt(iv, ciphertext, tag, output, associatedData);
+            if ((!encrypt || padding == PaddingMode.None) && input.Length % specification.BlockSize != 0
+                || (!encrypt && padding != PaddingMode.None && padding != PaddingMode.Zeros && input.Length == 0))
+                throw new ArgumentException(L("InvalidCipherLength"));
         }
-        else
-        {
-            using var chacha = new ChaCha20Poly1305(key);
-            if (encrypt) chacha.Encrypt(iv, input, output.AsSpan(0, input.Length), output.AsSpan(input.Length), associatedData);
-            else chacha.Decrypt(iv, ciphertext, tag, output, associatedData);
-        }
+    }
+
+    private static byte[] AddPadding(byte[] input, int blockSize, PaddingMode padding)
+    {
+        int count = blockSize - input.Length % blockSize;
+        // Zero padding does not append a block to an already aligned message.
+        if (padding == PaddingMode.Zeros && count == blockSize) return input.ToArray();
+        byte[] output = new byte[input.Length + count];
+        input.CopyTo(output, 0);
+        if (padding == PaddingMode.PKCS7) output.AsSpan(input.Length).Fill((byte)count);
+        else if (padding == PaddingMode.ISO10126) RandomNumberGenerator.Fill(output.AsSpan(input.Length, count - 1));
+        if (padding is PaddingMode.ANSIX923 or PaddingMode.ISO10126) output[^1] = (byte)count;
         return output;
     }
 
-    private static void Validate(string algorithm, byte[] key, byte[] iv, PaddingMode padding)
+    private static byte[] RemovePadding(byte[] input, int blockSize, PaddingMode padding)
     {
-        int length = IvLength(algorithm);
-        bool validKey = algorithm switch
+        if (padding == PaddingMode.Zeros)
         {
-            "AES-GCM" or "AES-CBC" => key.Length is 16 or 24 or 32,
-            "ChaCha20-Poly1305" => key.Length == 32,
-            _ => key.Length == 16
-        };
-        if (!validKey) throw new ArgumentException(L("InvalidKeySize"));
-        if (iv.Length != length) throw new ArgumentException(string.Format(System.Globalization.CultureInfo.CurrentCulture, L("InvalidIvSize"), length));
-        if (padding is not (PaddingMode.None or PaddingMode.PKCS7)
-            || (!algorithm.EndsWith("-CBC", StringComparison.Ordinal) && padding != PaddingMode.None))
-            throw new ArgumentException(L("InvalidPadding"));
+            int end = input.Length;
+            while (end > 0 && input[end - 1] == 0) end--;
+            byte[] result = input[..end];
+            CryptographicOperations.ZeroMemory(input);
+            return result;
+        }
+        int count = input[^1];
+        int mismatch = count is < 1 || count > blockSize ? 1 : 0;
+        int checkedCount = Math.Min(count, blockSize);
+        if (padding != PaddingMode.ISO10126)
+        {
+            for (int i = 1; i <= checkedCount; i++)
+            {
+                byte expected = padding == PaddingMode.PKCS7 || i == 1 ? (byte)count : (byte)0;
+                mismatch |= input[^i] ^ expected;
+            }
+        }
+        if (mismatch != 0)
+        {
+            CryptographicOperations.ZeroMemory(input);
+            throw new CryptographicException(L("InvalidPadding"));
+        }
+        byte[] unpadded = input[..^count];
+        CryptographicOperations.ZeroMemory(input);
+        return unpadded;
     }
 }

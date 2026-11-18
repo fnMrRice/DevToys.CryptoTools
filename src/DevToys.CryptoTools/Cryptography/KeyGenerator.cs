@@ -18,7 +18,9 @@ internal static class KeyGenerator
         "ECDSA-P256", "ECDSA-P384", "ECDSA-P521", "ECDSA-secp256k1", "ECDSA-brainpoolP256r1", "ECDSA-brainpoolP384r1", "ECDSA-brainpoolP512r1",
         "ECDH-P256", "ECDH-P384", "ECDH-P521", "ECDH-secp256k1", "ECDH-brainpoolP256r1", "ECDH-brainpoolP384r1", "ECDH-brainpoolP512r1",
         "Ed25519", "Ed448", "X25519", "X448", "SM2",
-        "AES-128", "AES-192", "AES-256", "ChaCha20-256", "SM4-128"
+        "AES-128", "AES-192", "AES-256", "ChaCha20-256", "SM4-128",
+        .. SymmetricAlgorithmCatalog.Algorithms.Where(a => a is not ("AES" or "SM4" or "ChaCha20"))
+            .Select(a => a + "-" + (SymmetricAlgorithmCatalog.DefaultKeyLength(a) * 8).ToString(System.Globalization.CultureInfo.InvariantCulture))
     ];
 
     internal static KeyMaterial Generate(string algorithm)
@@ -35,7 +37,7 @@ internal static class KeyGenerator
         if (algorithm is "Ed25519" or "Ed448" or "X25519" or "X448")
             return Export(GenerateModernCurve(algorithm));
 
-        int bytes = algorithm switch { "AES-128" or "SM4-128" => 16, "AES-192" => 24, _ => 32 };
+        int bytes = int.Parse(algorithm[(algorithm.LastIndexOf('-') + 1)..], System.Globalization.CultureInfo.InvariantCulture) / 8;
         return new(SymmetricKey: Convert.ToBase64String(RandomNumberGenerator.GetBytes(bytes)));
     }
 

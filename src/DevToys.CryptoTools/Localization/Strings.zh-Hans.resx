@@ -14,7 +14,7 @@
   <data name="EcTitle" xml:space="preserve"><value>椭圆曲线加解密与验签</value></data>
   <data name="EcDescription" xml:space="preserve"><value>ECDSA、EdDSA 签名验签及 ECDH/XDH 混合加解密。</value></data>
   <data name="SymTitle" xml:space="preserve"><value>对称加解密</value></data>
-  <data name="SymDescription" xml:space="preserve"><value>AES、SM4 与 ChaCha20-Poly1305 加解密。</value></data>
+  <data name="SymDescription" xml:space="preserve"><value>支持 15 种分组和流算法，以及对应模式和填充的加解密。</value></data>
   <data name="Algorithm" xml:space="preserve"><value>算法</value></data>
   <data name="Generate" xml:space="preserve"><value>生成</value></data>
   <data name="PublicKey" xml:space="preserve"><value>公钥（SPKI PEM）</value></data>
@@ -62,7 +62,7 @@
   <data name="InvalidTextEncoding" xml:space="preserve"><value>这些字节不是有效的 UTF-8 文本，请选择 Base64 或 Hex。</value></data>
   <data name="InvalidIvSize" xml:space="preserve"><value>IV / nonce 必须包含 {0} 个字节。</value></data>
   <data name="InvalidPadding" xml:space="preserve"><value>当前模式不支持所选填充。</value></data>
-  <data name="InvalidCiphertext" xml:space="preserve"><value>密文必须包含 16 字节的认证标签。</value></data>
+  <data name="InvalidCiphertext" xml:space="preserve"><value>密文长度小于所选模式所需的认证标签长度。</value></data>
   <data name="Key" xml:space="preserve"><value>密钥</value></data>
   <data name="Mode" xml:space="preserve"><value>模式</value></data>
   <data name="BlockPadding" xml:space="preserve"><value>填充</value></data>
@@ -70,7 +70,7 @@
   <data name="Utf8Text" xml:space="preserve"><value>文本（UTF-8）</value></data>
   <data name="GenerateIv" xml:space="preserve"><value>随机 IV</value></data>
   <data name="IvTitle" xml:space="preserve"><value>IV / nonce（{0} 字节）</value></data>
-  <data name="IvHint" xml:space="preserve"><value>留空时，加密会自动生成。</value></data>
+  <data name="IvHint" xml:space="preserve"><value>留空时自动生成</value></data>
   <data name="CbcHint" xml:space="preserve"><value>CBC 使用 16 字节 IV；无填充时，输入长度必须为 16 字节的整数倍。CBC 不提供密文认证。</value></data>
   <data name="AuthenticatedHint" xml:space="preserve"><value>使用 12 字节 nonce，16 字节认证标签附在密文末尾。</value></data>
   <data name="UseOutputAsInput" xml:space="preserve"><value>输出转为输入</value></data>
@@ -181,4 +181,7 @@
   <data name="CertEnabled" xml:space="preserve"><value>启用</value></data>
   <data name="CertDisabled" xml:space="preserve"><value>禁用</value></data>
   <data name="EcSm2EncryptHint" xml:space="preserve"><value>SM2 使用 sm2p256v1 和 SM3；密文为 C1C3C2 或 C1C2C3 的 Base64，C1 为非压缩点。</value></data>
+  <data name="IvNotRequired" xml:space="preserve"><value>IV（此模式不使用）</value></data>
+  <data name="InvalidCipherLength" xml:space="preserve"><value>输入长度不符合所选模式和填充的要求。</value></data>
+  <data name="UnsupportedAssociatedData" xml:space="preserve"><value>此模式不支持附加认证数据。</value></data>
 </root>
