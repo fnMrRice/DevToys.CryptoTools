@@ -13,14 +13,14 @@ internal sealed class KeyFileInput
     internal IUIFileSelector Selector { get; }
     private readonly Action? _onImported;
 
-    internal KeyFileInput(string id, Func<Func<ValueTask>, ValueTask> execute, Action? onImported = null)
+    internal KeyFileInput(string id, Func<Func<ValueTask>, ValueTask> execute, Action? onImported = null, string? hint = null)
     {
         _onImported = onImported;
         Editor = MultiLineTextInput(id + "-pem").Title(L("KeyOrCertificate")).ShowCommandBar().CanCopyWhenEditable().Extendable();
         Selector = FileSelector(id + "-file").CanSelectOneFile().LimitFileTypesTo("pem", "key", "der", "cer", "crt", "pub")
             .OnFilesSelected(files => files.Length == 0 ? ValueTask.CompletedTask : execute(() => ImportAsync(files)));
         View = Grid(id).Rows(Auto, Auto, new UIGridLength(125)).RowSmallSpacing().Cells(
-            At(0, Label().Text(L("KeyImportHint")).AlignHorizontally(UIHorizontalAlignment.Left)),
+            At(0, Label().Text(hint ?? L("KeyImportHint")).AlignHorizontally(UIHorizontalAlignment.Left)),
             At(1, Selector), At(2, Editor));
     }
 

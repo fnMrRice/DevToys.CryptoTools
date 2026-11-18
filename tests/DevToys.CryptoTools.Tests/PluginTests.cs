@@ -11,12 +11,12 @@ namespace DevToys.CryptoTools.Tests;
 public class PluginTests
 {
     [Fact]
-    public void MefDiscoversSevenToolsInTheRequestedGroups()
+    public void MefDiscoversSixToolsInTheRequestedGroups()
     {
         using var catalog = new AssemblyCatalog(typeof(KeyGeneratorTool).Assembly);
         using var container = new CompositionContainer(catalog);
         var tools = container.GetExportedValues<IGuiTool>().ToArray();
-        Assert.Equal(7, tools.Length);
+        Assert.Equal(6, tools.Length);
         Assert.Single(container.GetExportedValues<IResourceAssemblyIdentifier>());
         Assert.Single(container.GetExportedValues<GuiToolGroup>());
         foreach (var tool in tools)

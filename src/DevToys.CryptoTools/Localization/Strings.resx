@@ -11,8 +11,8 @@
   <data name="CertDescription" xml:space="preserve"><value>Generate configurable X.509 certificates, self-signed or issued from a CSR by a CA.</value></data>
   <data name="RsaTitle" xml:space="preserve"><value>RSA</value></data>
   <data name="RsaDescription" xml:space="preserve"><value>RSA encryption, decryption, signing and verification.</value></data>
-  <data name="EcTitle" xml:space="preserve"><value>Elliptic curve cryptography</value></data>
-  <data name="EcDescription" xml:space="preserve"><value>ECDSA, EdDSA and ECDH/XDH hybrid encryption.</value></data>
+  <data name="EcTitle" xml:space="preserve"><value>Elliptic curve algorithms</value></data>
+  <data name="EcDescription" xml:space="preserve"><value>Encrypt, decrypt, sign and verify with elliptic curve algorithms and PEM/Base64/Hex public keys.</value></data>
   <data name="SymTitle" xml:space="preserve"><value>Symmetric key algorithms</value></data>
   <data name="SymDescription" xml:space="preserve"><value>Encrypt and decrypt using 15 block and stream algorithms with compatible modes and padding.</value></data>
   <data name="Algorithm" xml:space="preserve"><value>Algorithm</value></data>
@@ -184,4 +184,12 @@
   <data name="IvNotRequired" xml:space="preserve"><value>IV (not used in this mode)</value></data>
   <data name="InvalidCipherLength" xml:space="preserve"><value>The input length is invalid for this mode and padding.</value></data>
   <data name="UnsupportedAssociatedData" xml:space="preserve"><value>This mode does not support additional authenticated data.</value></data>
+  <data name="PublicKeySource" xml:space="preserve"><value>Public key source</value></data>
+  <data name="PublicKeyMaterial" xml:space="preserve"><value>Public key / certificate</value></data>
+  <data name="EcPublicImportHint" xml:space="preserve"><value>Drop a public key or certificate, or enter PEM / Base64 / Hex key data.</value></data>
+  <data name="EcPrivateImportHint" xml:space="preserve"><value>Drop an unencrypted PEM/DER private key, or paste its PEM text.</value></data>
+  <data name="CoordinateEncoding" xml:space="preserve"><value>Coordinate encoding</value></data>
+  <data name="CoordinateXValue" xml:space="preserve"><value>Public key X</value></data>
+  <data name="CoordinateYValue" xml:space="preserve"><value>Public key Y</value></data>
+  <data name="CoordinateEncodingHint" xml:space="preserve"><value>Unsigned big-endian coordinates in the selected encoding.</value></data>
 </root>

@@ -11,8 +11,8 @@
   <data name="CertDescription" xml:space="preserve"><value>配置并生成 X.509 证书，支持自签名和 CA 根据 CSR 签发。</value></data>
   <data name="RsaTitle" xml:space="preserve"><value>RSA 加解密与验签</value></data>
   <data name="RsaDescription" xml:space="preserve"><value>RSA 加密、解密、签名与验签。</value></data>
-  <data name="EcTitle" xml:space="preserve"><value>椭圆曲线加解密与验签</value></data>
-  <data name="EcDescription" xml:space="preserve"><value>ECDSA、EdDSA 签名验签及 ECDH/XDH 混合加解密。</value></data>
+  <data name="EcTitle" xml:space="preserve"><value>椭圆曲线算法</value></data>
+  <data name="EcDescription" xml:space="preserve"><value>选择椭圆曲线加密、解密、签名或验签，公钥支持 PEM、Base64、Hex。</value></data>
   <data name="SymTitle" xml:space="preserve"><value>对称密钥算法</value></data>
   <data name="SymDescription" xml:space="preserve"><value>支持 15 种分组和流算法，以及对应模式和填充的加解密。</value></data>
   <data name="Algorithm" xml:space="preserve"><value>算法</value></data>
@@ -184,4 +184,12 @@
   <data name="IvNotRequired" xml:space="preserve"><value>IV（此模式不使用）</value></data>
   <data name="InvalidCipherLength" xml:space="preserve"><value>输入长度不符合所选模式和填充的要求。</value></data>
   <data name="UnsupportedAssociatedData" xml:space="preserve"><value>此模式不支持附加认证数据。</value></data>
+  <data name="PublicKeySource" xml:space="preserve"><value>公钥来源</value></data>
+  <data name="PublicKeyMaterial" xml:space="preserve"><value>公钥 / 证书</value></data>
+  <data name="EcPublicImportHint" xml:space="preserve"><value>拖入公钥或证书，或输入 PEM / Base64 / Hex 公钥数据。</value></data>
+  <data name="EcPrivateImportHint" xml:space="preserve"><value>拖入未加密的 PEM/DER 私钥，或粘贴 PEM 私钥文本。</value></data>
+  <data name="CoordinateEncoding" xml:space="preserve"><value>坐标编码</value></data>
+  <data name="CoordinateXValue" xml:space="preserve"><value>公钥 X 坐标</value></data>
+  <data name="CoordinateYValue" xml:space="preserve"><value>公钥 Y 坐标</value></data>
+  <data name="CoordinateEncodingHint" xml:space="preserve"><value>使用所选编码输入无符号大端公钥坐标。</value></data>
 </root>
