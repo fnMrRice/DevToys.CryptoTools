@@ -33,13 +33,12 @@ internal sealed class SymmetricTool : CryptoToolBase
     private readonly IUIMultiLineTextInput _input = MultiLineTextInput("sym-input").Title(L("Input")).ShowCommandBar().Extendable();
     private readonly IUIMultiLineTextInput _output = MultiLineTextInput("sym-output").Title(L("Output")).ReadOnly().ShowCommandBar().Extendable();
     private readonly IUIButton _generateIv;
-    private readonly IUIGrid _layout;
+    private readonly IUIStack _layout;
     private byte[]? _lastOutput;
     private byte[]? _generatedIv;
     private bool _automaticIv = true;
     private bool _writingIv;
 
-    protected override bool IsScrollable => false;
     protected override IUIElement BuildLayout() => _layout;
 
     public SymmetricTool()
@@ -83,15 +82,18 @@ internal sealed class SymmetricTool : CryptoToolBase
             Stack().Horizontal().SmallSpacing().WithChildren(
                 CreateActionButton(L("GenerateKey"), GenerateKey, "sym-generate-key"), _generateIv))
             .AlignVertically(UIVerticalAlignment.Top);
-        var configuration = Grid("sym-configuration").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().Cells(At(0, 0, options), At(0, 1, keyPanel));
+        var configuration = Grid("sym-configuration").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing()
+            .AlignVertically(UIVerticalAlignment.Top).Cells(At(0, 0, options), At(0, 1, keyPanel));
         var actions = Stack("sym-actions").Horizontal().SmallSpacing().AlignHorizontally(UIHorizontalAlignment.Left).WithChildren(
             CreateActionButton(L("Encrypt"), () => Transform(true), "sym-encrypt").AccentAppearance(),
             CreateActionButton(L("Decrypt"), () => Transform(false), "sym-decrypt"),
             CreateActionButton(L("UseOutputAsInput"), UseOutputAsInput, "sym-use-output"),
             CreateActionButton(L("Clear"), Clear, "sym-clear"));
         var editors = SplitGrid("sym-editors").Vertical().WithLeftPaneChild(_input).WithRightPaneChild(_output);
-        _layout = Grid("sym-layout").Rows(Auto, Auto, Fraction(1), Auto).RowMediumSpacing().Cells(
-            At(0, 0, configuration), At(1, 0, actions), At(2, 0, editors), At(3, 0, Status));
+        var editorArea = Grid("sym-editor-area").Rows(new UIGridLength(350)).AlignVertically(UIVerticalAlignment.Top)
+            .Cells(Cell().WithChild(editors));
+        _layout = Stack("sym-layout").Vertical().MediumSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(configuration, actions, editorArea, Status);
         UpdateModes();
     }
 

@@ -8,7 +8,7 @@ namespace DevToys.CryptoTools.UI;
 internal sealed class WorkflowContainer
 {
     private readonly IUIElement _initial;
-    internal IUIGrid Root { get; } = Grid().Rows(Auto, Fraction(1)).RowMediumSpacing();
+    internal IUIGrid Root { get; } = Grid().AlignVertically(UIVerticalAlignment.Top).RowMediumSpacing();
 
     internal WorkflowContainer(IUIElement initial)
     {
@@ -19,12 +19,12 @@ internal sealed class WorkflowContainer
     internal void Open(string title, CryptoToolBase destination, string dataTypeName, object draft)
     {
         destination.OnDataReceived(dataTypeName, draft);
-        Root.Cells(
-            At(0, Stack().Horizontal().MediumSpacing().WithChildren(
+        Root.Rows(Auto, Auto).Cells(
+            At(0, Stack().Horizontal().MediumSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren(
                 Button().Text(L("Back")).OnClick(Restore), Label().Text(title).Style(UILabelStyle.BodyStrong))),
             At(1, destination.View.RootElement!));
     }
 
-    private void Restore() => Root.Cells(At(1, _initial));
+    private void Restore() => Root.Rows(Auto).Cells(At(0, _initial));
     private static IUIGridCell At(int row, IUIElement child) => Cell().Row(row).Column(0).WithChild(child);
 }

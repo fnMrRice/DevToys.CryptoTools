@@ -39,18 +39,21 @@ internal sealed class CertificateGeneratorTool : CryptoToolBase
             .OnFilesSelected(files => files.Length == 0 ? ValueTask.CompletedTask : ExecuteAsync(() => ImportCsr(files)));
         var issuerFile = FileSelector("cert-issuer-file").CanSelectOneFile().LimitFileTypesTo("pem", "crt", "cer", "der")
             .OnFilesSelected(files => files.Length == 0 ? ValueTask.CompletedTask : ExecuteAsync(() => ImportIssuer(files)));
-        var issuerPanel = Grid("cert-issuer-panel").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().Cells(
-            At(0, 0, Stack().Vertical().SmallSpacing().WithChildren(issuerFile, _issuerCertificate)), At(0, 1, _issuerKey.View)).Hide();
+        var issuerPanel = Grid("cert-issuer-panel").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing()
+            .AlignVertically(UIVerticalAlignment.Top).Cells(
+            At(0, 0, Stack().Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top)
+                .WithChildren(issuerFile, _issuerCertificate)), At(0, 1, _issuerKey.View)).Hide();
         _useIssuer.OnToggle(on => { if (on) issuerPanel.Show(); else issuerPanel.Hide(); });
-        var requestPanel = Grid("cert-request-panel").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().Cells(
-            At(0, 0, Stack().Vertical().SmallSpacing().WithChildren(Label().Text(L("CertCsrImportHint")), csrFile,
+        var requestPanel = Grid("cert-request-panel").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing()
+            .AlignVertically(UIVerticalAlignment.Top).Cells(
+            At(0, 0, Stack().Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren(Label().Text(L("CertCsrImportHint")), csrFile,
                 CreateActionButton(L("CertReadCsr"), ReadCsr, "cert-read-csr"))), At(0, 1, _csr));
         var actions = Stack().Horizontal().SmallSpacing().AlignHorizontally(UIHorizontalAlignment.Left).WithChildren(
             CreateActionButton(L("GenerateCert"), Generate, "cert-generate").AccentAppearance(),
             CreateActionButton(L("Clear"), () => { _output.Text(""); _privateKey.Text(""); _csr.Text(""); }, "cert-clear-output"));
-        var results = Grid().Rows(new UIGridLength(350)).Cells(At(0, 0,
+        var results = Grid().Rows(new UIGridLength(350)).AlignVertically(UIVerticalAlignment.Top).Cells(At(0, 0,
             SplitGrid("cert-results").Vertical().WithLeftPaneChild(_output).WithRightPaneChild(_privateKey)));
-        _layout = Stack("cert-layout").Vertical().MediumSpacing().WithChildren(
+        _layout = Stack("cert-layout").Vertical().MediumSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren(
             _options.View, Label().Text(L("CertRequestSection")).Style(UILabelStyle.BodyStrong), requestPanel,
             _useIssuer, issuerPanel, actions, results, Status);
     }

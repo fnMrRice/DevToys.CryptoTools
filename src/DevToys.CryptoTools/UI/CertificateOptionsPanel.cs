@@ -74,15 +74,16 @@ internal sealed class CertificateOptionsPanel
         ku.AddRange(KeyUsages.Select(usage => Flag(usage.Name, usage.Name == "DigitalSignature")));
         var eku = new List<IUIElement> { Heading("CertExtendedKeyUsage"), Flag("EnhancedKeyUsageCritical") };
         eku.AddRange(ExtendedUsages.Select(usage => Flag(usage.Name)));
-        right.Add(Grid().Columns(Fraction(1), Fraction(1)).ColumnMediumSpacing().Cells(
-            At(0, 0, Stack().Vertical().SmallSpacing().WithChildren([.. ku])), At(0, 1, Stack().Vertical().SmallSpacing().WithChildren([.. eku]))));
+        right.Add(Grid().Columns(Fraction(1), Fraction(1)).ColumnMediumSpacing().AlignVertically(UIVerticalAlignment.Top).Cells(
+            At(0, 0, Stack().Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren([.. ku])),
+            At(0, 1, Stack().Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren([.. eku]))));
         right.Add(Text("CustomEkuOids"));
         right.Add(Heading("CertCustomExtensions"));
         right.Add(Text("CustomExtensionOid"));
         right.Add(Text("CustomExtensionDer"));
         right.Add(Flag("CustomExtensionCritical"));
-        right.Add(Grid().Rows(new UIGridLength(150)).Cells(At(0, 0, _customExtensions)));
-        View = Grid(id + "-options").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().Cells(
+        right.Add(Grid().Rows(new UIGridLength(180)).AlignVertically(UIVerticalAlignment.Top).Cells(At(0, 0, _customExtensions)));
+        View = Grid(id + "-options").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().AlignVertically(UIVerticalAlignment.Top).Cells(
             At(0, 0, Stack().Vertical().MediumSpacing().WithChildren([.. left]).AlignVertically(UIVerticalAlignment.Top)),
             At(0, 1, Stack().Vertical().MediumSpacing().WithChildren([.. right]).AlignVertically(UIVerticalAlignment.Top)));
         _flags["IncludeSan"].OnToggle(on =>

@@ -11,7 +11,7 @@ public class SymmetricToolTests
     public void UsesTwoConfigurationColumnsResizableEditorsAndHexDefaults()
     {
         var tool = new SymmetricTool();
-        Assert.False(tool.View.IsScrollable);
+        Assert.True(tool.View.IsScrollable);
         Assert.Equal(2, Find<IUIGrid>(tool, "sym-configuration").Columns!.Length);
         var editors = Find<IUISplitGrid>(tool, "sym-editors");
         Assert.Equal(UIOrientation.Vertical, editors.Orientation);

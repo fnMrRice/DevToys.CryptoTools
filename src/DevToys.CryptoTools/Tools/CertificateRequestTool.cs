@@ -32,9 +32,9 @@ internal sealed class CertificateRequestTool : CryptoToolBase
             CreateActionButton(L("GenerateCsr"), Generate, "csr-generate").AccentAppearance(),
             CreateActionButton(L("CertIssueCsr"), SendToCertificate, "csr-issue"),
             CreateActionButton(L("Clear"), () => { _output.Text(""); _privateKey.Text(""); }, "csr-clear-output"));
-        var results = Grid().Rows(new UIGridLength(350)).Cells(Cell().WithChild(
+        var results = Grid().Rows(new UIGridLength(350)).AlignVertically(UIVerticalAlignment.Top).Cells(Cell().WithChild(
             SplitGrid("csr-results").Vertical().WithLeftPaneChild(_output).WithRightPaneChild(_privateKey)));
-        var layout = Stack("csr-layout").Vertical().MediumSpacing().WithChildren(
+        var layout = Stack("csr-layout").Vertical().MediumSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren(
             Label().Text(L("CsrBuilderHint")).AlignHorizontally(UIHorizontalAlignment.Left), _options.View, actions, results, Status);
         _workflow = new WorkflowContainer(layout);
     }

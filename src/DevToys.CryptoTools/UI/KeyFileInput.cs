@@ -19,7 +19,7 @@ internal sealed class KeyFileInput
         Editor = MultiLineTextInput(id + "-pem").Title(L("KeyOrCertificate")).ShowCommandBar().CanCopyWhenEditable().Extendable();
         Selector = FileSelector(id + "-file").CanSelectOneFile().LimitFileTypesTo("pem", "key", "der", "cer", "crt", "pub")
             .OnFilesSelected(files => files.Length == 0 ? ValueTask.CompletedTask : execute(() => ImportAsync(files)));
-        View = Grid(id).Rows(Auto, Auto, new UIGridLength(125)).RowSmallSpacing().Cells(
+        View = Grid(id).Rows(Auto, Auto, new UIGridLength(180)).RowSmallSpacing().AlignVertically(UIVerticalAlignment.Top).Cells(
             At(0, Label().Text(hint ?? L("KeyImportHint")).AlignHorizontally(UIHorizontalAlignment.Left)),
             At(1, Selector), At(2, Editor));
     }
