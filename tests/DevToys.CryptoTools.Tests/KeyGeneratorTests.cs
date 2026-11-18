@@ -36,4 +36,14 @@ public class KeyGeneratorTests
 
     [Fact]
     public void RejectsUnknownAlgorithms() => Assert.Throws<ArgumentException>(() => KeyGenerator.Generate("unknown"));
+
+    [Fact]
+    public void GeneratorPageOnlyOffersAsymmetricKeyPairs()
+    {
+        var tool = new Tools.KeyGeneratorTool();
+        var algorithms = Assert.IsAssignableFrom<DevToys.Api.IUISelectDropDownList>(tool.View.GetChildElementById("key-algorithm"));
+        Assert.Equal(KeyGenerator.AsymmetricAlgorithms, algorithms.Items!.Select(item => (string)item.Value!));
+        Assert.DoesNotContain(algorithms.Items!, item => ((string)item.Value!).StartsWith("AES", StringComparison.Ordinal));
+        Assert.Null(tool.View.GetChildElementById("key-symmetric"));
+    }
 }

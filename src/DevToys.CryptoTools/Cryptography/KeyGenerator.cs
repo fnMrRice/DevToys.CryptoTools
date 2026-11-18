@@ -23,6 +23,12 @@ internal static class KeyGenerator
             .Select(a => a + "-" + (SymmetricAlgorithmCatalog.DefaultKeyLength(a) * 8).ToString(System.Globalization.CultureInfo.InvariantCulture))
     ];
 
+    internal static readonly string[] AsymmetricAlgorithms = Algorithms.Where(algorithm =>
+        algorithm.StartsWith("RSA-", StringComparison.Ordinal)
+        || algorithm.StartsWith("ECDSA-", StringComparison.Ordinal)
+        || algorithm.StartsWith("ECDH-", StringComparison.Ordinal)
+        || algorithm is "Ed25519" or "Ed448" or "X25519" or "X448" or "SM2").ToArray();
+
     internal static KeyMaterial Generate(string algorithm)
     {
         if (!Algorithms.Contains(algorithm)) throw new ArgumentException(L("InvalidAlgorithm"));

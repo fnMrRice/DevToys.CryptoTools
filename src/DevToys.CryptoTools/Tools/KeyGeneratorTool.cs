@@ -26,19 +26,17 @@ internal sealed class KeyGeneratorTool : CryptoToolBase
     {
         Note(L("KeyNote"));
         var algorithm = Add(SelectDropDownList("key-algorithm").Title(L("Algorithm"))
-            .WithItems(KeyGenerator.Algorithms.Select(a => Item(a, a)).ToArray()).Select(0).AlignHorizontally(UIHorizontalAlignment.Left));
+            .WithItems(KeyGenerator.AsymmetricAlgorithms.Select(a => Item(a, a)).ToArray()).Select(0).AlignHorizontally(UIHorizontalAlignment.Stretch));
         var publicKey = Add(MultiLineTextInput("key-public").Title(L("PublicKey")).ReadOnly());
         var privateKey = Add(MultiLineTextInput("key-private").Title(L("PrivateKey")).ReadOnly());
-        var symmetricKey = Add(MultiLineTextInput("key-symmetric").Title(L("SymKey")).ReadOnly());
         KeyPairDraft? draft = null;
         Add(CreateActionButton(L("Generate"), () =>
         {
             draft = null;
-            publicKey.Text(""); privateKey.Text(""); symmetricKey.Text("");
+            publicKey.Text(""); privateKey.Text("");
             var result = KeyGenerator.Generate(Selected(algorithm));
             publicKey.Text(result.PublicKey);
             privateKey.Text(result.PrivateKey);
-            symmetricKey.Text(result.SymmetricKey);
             if (result.PrivateKey.Length > 0) draft = new KeyPairDraft(Selected(algorithm), result.PublicKey, result.PrivateKey);
         }, "key-generate"));
         var send = CreateActionButton(L("SendToCsr"), () =>
@@ -47,7 +45,7 @@ internal sealed class KeyGeneratorTool : CryptoToolBase
             OpenRequest(draft);
         }, "key-send-csr");
         Add(send);
-        ActionButton(L("Clear"), () => { draft = null; publicKey.Text(""); privateKey.Text(""); symmetricKey.Text(""); });
+        ActionButton(L("Clear"), () => { draft = null; publicKey.Text(""); privateKey.Text(""); });
         _workflow = new WorkflowContainer(base.BuildLayout());
     }
 
