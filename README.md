@@ -17,7 +17,7 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.10.nupkg` from `artifacts/`.
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.11.nupkg` from `artifacts/`.
 2. Restart DevToys. Key, certificate request, certificate and CRC tools appear under **Generators**; RSA, symmetric key algorithms and elliptic curve algorithms appear under **Cryptography** (加解密 in Chinese).
 3. Generate an asymmetric pair using the algorithm needed by your operation. Choose RSA, ECDSA, ECDH, Ed25519, Ed448, X25519, X448 or SM2 on the algorithm card; expand it to select the RSA key size, EC curve and optional private key password. Actions are above the editors, with the private key on the left and public key on the right. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
@@ -31,7 +31,7 @@ Click **Export key pair** to open the export dialog. Enter the base file name an
 
 ## Elliptic curve algorithms
 
-The merged page uses two configuration columns and resizable side-by-side input/output. Select **Encrypt / Decrypt / Sign / Verify** at the upper left. Algorithms are limited to the operations they support; switching between ECDH and ECDSA preserves the selected curve. Encryption and verification show **Public key source** in the left parameter column; the right column holds the public key data, encoding and file import. Decryption and signing show a separate private-key input. Drop unencrypted PEM/DER keys or PEM/DER X.509 `.cer` / `.crt` certificates into the file import area; certificates are converted to SPKI public keys. PKCS#8 and SEC1 EC private keys are normalized automatically. PFX/PKCS#12 and password-encrypted key files are not supported by this importer.
+The page uses native setting cards and side-by-side input/output. Select **Encrypt / Decrypt / Sign / Verify** on the visible Mode card; choose the algorithm in the **Parameters** card header and expand it for the public-key source, encodings and SM2 user ID. Options appear only for the modes and algorithms that use them. Switching between ECDH and ECDSA preserves the selected curve. Key material and file import remain below the settings, with a separate private-key input for decryption and signing. Drop unencrypted PEM/DER keys or PEM/DER X.509 `.cer` / `.crt` certificates into the file import area; certificates are converted to SPKI public keys. PKCS#8 and SEC1 EC private keys are normalized automatically. PFX/PKCS#12 and password-encrypted key files are not supported by this importer.
 
 Public key data accepts **PEM / Base64 / Hex**. Base64 and Hex can encode SPKI DER, certificate DER or a raw public key: prime-curve SEC1 compressed/uncompressed points or X||Y, Ed25519/Ed448 raw public keys, and X25519/X448 raw public keys. Private material is rejected in public-key mode. Dropping a file resets its encoding to PEM.
 
@@ -39,7 +39,7 @@ Public key data accepts **PEM / Base64 / Hex**. Base64 and Hex can encode SPKI D
 
 ## RSA algorithms
 
-The RSA page matches the elliptic curve layout: select **Encrypt / Decrypt / Sign / Verify** at the upper left, with public/private material at the upper right and resizable input/output below. Encryption/decryption show encryption padding; signing/verification show signature padding and hash. Only verification displays the signature input. **Use output as input** switches encryption to decryption, or transfers a generated signature into verification while preserving the message.
+The RSA page matches the elliptic curve layout: the Mode card selects **Encrypt / Decrypt / Sign / Verify**, and the expandable **Parameters** card contains padding, hash, public-key source and encoding settings. Key material stays below the settings, followed by side-by-side input/output. Encryption/decryption show encryption padding; signing/verification show signature padding and hash. Only verification displays the signature input. **Use output as input** switches encryption to decryption, or transfers a generated signature into verification while preserving the message.
 
 For encryption and verification, choose **Key / certificate** or **Modulus / exponent (n/e)**. Public data accepts PEM, Base64 or Hex SPKI/PKCS#1 public keys or certificate DER. Modulus/exponent are unsigned big-endian integers in Hex or Base64; Hex permits optional whitespace and `0x`. Decryption/signing use a separate private key field supporting unencrypted PKCS#8 and PKCS#1 PEM/DER. File import uses the native drag/drop area and resets public data encoding to PEM. Certificates provide public keys only; private material and other key types are rejected as RSA public inputs.
 
@@ -50,6 +50,8 @@ The two-column builders expose subject CN/O/OU/C/ST/L plus full DN override; aut
 Import a private key on the CSR form to sign with an existing pair. Dropping a CSR on the certificate form verifies its signature and loads its editable request fields. An external CSR does not contain a private key: import the matching subject private key to self-sign, or supply an issuer CA certificate and its matching private key to issue it. Issuer key correspondence, CA constraints and validity bounds are checked. Requested extensions are shown as editable options and the certificate is generated only when **Generate certificate** is clicked.
 
 All operations run locally. Inputs, private keys and plaintext are not logged or saved in settings. **Clear** removes the current tool's text; copied clipboard contents remain under your control.
+
+Tool pages use natural-height, top-aligned sections and scroll when the content exceeds the window. Editor regions have bounded heights, while key import, certificate options and expanded parameters grow with their content. CSR handoffs add a navigation row only while a destination form is open.
 
 ## Formats and interoperability
 
@@ -111,7 +113,7 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.10.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.11.nupkg
 ```
 
 Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation, CRC preset checks, streamed file input, checksum comparison and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
