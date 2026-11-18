@@ -17,11 +17,17 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.7.nupkg` from `artifacts/`.
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.9.nupkg` from `artifacts/`.
 2. Restart DevToys. Key, certificate request, certificate and CRC tools appear under **Generators**; RSA, symmetric key algorithms and elliptic curve algorithms appear under **Cryptography** (加解密 in Chinese).
-3. Generate a key using the algorithm needed by your operation. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV; choose **Base64** when pasting a key from the key generator. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
+3. Generate an asymmetric pair using the algorithm needed by your operation. Choose RSA, ECDSA, ECDH, Ed25519, Ed448, X25519, X448 or SM2 on the algorithm card; expand it to select the RSA key size or EC curve. Actions are above the editors, with the private key on the left and public key on the right. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
 5. Certificates and CSRs are PEM text. Save the certificate/request and its matching PKCS#8 private key separately. A new key is created only when no subject private key is imported. The **Create certificate request** button on the key generator opens the CSR form with the existing pair; **Use CSR to issue certificate** opens certificate issuance with that request. These are the actual destination forms embedded in the current tool with a **Back** button; no clipboard or sidebar navigation is needed. Each form is also available separately in Generators.
+
+The key generator accepts an optional password. When generating, leaving it empty produces an unencrypted PKCS#8 private key; entering a password produces an encrypted PKCS#8 PEM (`ENCRYPTED PRIVATE KEY`) using PBES2, AES-256-CBC and PBKDF2-HMAC-SHA256 with a fresh salt and IV. The password is applied at generation time. Changing it afterwards affects the next generated pair; exporting always preserves the already generated private key and its original password protection. The public key is unchanged. The direct CSR action uses the generated pair in memory, including when the exported private key is password protected.
+
+Each key editor has its own output format selector. Switching formats converts the existing key without generating a new pair or changing its password. Private keys support PKCS#8 PEM and DER shown as Hex or Base64; unencrypted RSA and EC keys also support traditional PKCS#1 / SEC1 PEM. Public keys support SubjectPublicKeyInfo PEM and DER shown as Hex or Base64; RSA public keys can also use PKCS#1 PEM. Password-protected private keys retain their encrypted PKCS#8 structure in both PEM and DER.
+
+Set the export base file name, then click **Export key pair** and choose a directory in the native folder picker. Files are saved as `<name>.key` (private) and `<name>.pub` (public), using each editor's selected format. PEM exports are text; DER exports contain the binary DER bytes, regardless of whether the editor displays them as Hex or Base64. Existing files are not overwritten; choose another name if either file already exists.
 
 ## Elliptic curve algorithms
 
@@ -88,11 +94,13 @@ ECB uses no IV. CBC/CFB/OFB/CTR use an IV equal to the block size (8 or 16 bytes
 
 ## Cyclic redundancy check (CRC)
 
-The Generators CRC page includes common standard presets and a custom mode. Selecting a preset fills its width, polynomial, initial value, input/output reflection and final XOR. All fields remain editable; changing a parameter switches the selector to **Custom** and clears the published preset check value. Input accepts UTF-8 text, Hex bytes or Base64 bytes.
+The Generators CRC page uses the same setting-card layout as the official hash generator: select the algorithm on the configuration card, and expand it to edit the width, polynomial, initial value, input/output reflection and final XOR. Changing a parameter switches the selector to **Custom** and clears the published preset check value.
+
+Enter UTF-8 text, Hex bytes or Base64 bytes on the left, or drop a file on the right. Files are read as raw bytes in 64 KiB chunks without loading the entire file into memory; the text encoding selector does not affect file bytes. Selecting a file clears the manual input. Typing in the text box clears the selected file. Results update automatically when the input, file, algorithm or parameters change; a superseded file calculation is cancelled.
 
 Polynomials, initial values and final XOR are unsigned Hex values, optionally prefixed with `0x`. The polynomial uses its normal representation without the implicit highest `x^width` term; for example, CRC-16/MODBUS uses `8005`, with reflection controlled by the switches. The width may be 1–64 bits, including sub-byte widths. Values outside the width and a zero polynomial are rejected.
 
-Output can be fixed-width numeric Hex, decimal, a binary string of exactly the selected width, or Base64 of big-endian CRC bytes (unused high bits are zero). The displayed preset check is the standard result for ASCII `123456789`, not the result of the current input. Preset parameters and check values are based on the [CRC RevEng catalogue](https://reveng.sourceforge.io/crc-catalogue/all.htm), and every included preset is tested against its published check value.
+Output is fixed-width uppercase Hex. The optional **Checksum to verify (Hex)** field automatically compares an expected checksum with the current result whenever either value changes, and accepts an optional `0x` prefix. The displayed preset check is the standard result for ASCII `123456789`, not the result of the current input. Preset parameters and check values are based on the [CRC RevEng catalogue](https://reveng.sourceforge.io/crc-catalogue/all.htm), and every included preset is tested against its published check value.
 
 ## Build and test
 
@@ -103,10 +111,10 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.7.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.9.nupkg
 ```
 
-Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
+Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation, CRC preset checks, streamed file input, checksum comparison and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
 
 The package bundles Bouncy Castle and its license plus the Chinese satellite assembly. DevToys supplies its API and framework dependencies; the package does not require a NuGet dependency restore when installed.
 
