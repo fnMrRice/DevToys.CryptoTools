@@ -20,7 +20,17 @@
   <data name="PublicKey" xml:space="preserve"><value>Public key (SPKI PEM)</value></data>
   <data name="PrivateKey" xml:space="preserve"><value>Private key (PKCS#8 PEM)</value></data>
   <data name="SymKey" xml:space="preserve"><value>Symmetric key (Base64)</value></data>
-  <data name="KeyNote" xml:space="preserve"><value>Keys are generated locally. Keep private and symmetric keys secret.</value></data>
+  <data name="KeyNote" xml:space="preserve"><value>Keys are generated locally. Please keep your key pair safe.</value></data>
+  <data name="KeyPassword" xml:space="preserve"><value>Private key password (optional)</value></data>
+  <data name="KeyPasswordHint" xml:space="preserve"><value>Enter a password to encrypt the exported private key, or leave empty for an unencrypted private key.</value></data>
+  <data name="KeyExport" xml:space="preserve"><value>Export key pair</value></data>
+  <data name="KeyExportName" xml:space="preserve"><value>Export file name (without extension)</value></data>
+  <data name="KeyExportNameDescription" xml:space="preserve"><value>Choose a folder when exporting. The private key uses .key and the public key uses .pub.</value></data>
+  <data name="KeyExportUnavailable" xml:space="preserve"><value>Folder selection is unavailable on this platform.</value></data>
+  <data name="KeyExportInvalidName" xml:space="preserve"><value>Enter a valid file name without a path.</value></data>
+  <data name="KeyExportMissingKeys" xml:space="preserve"><value>Generate both a private key and a public key before exporting.</value></data>
+  <data name="KeyExportFileExists" xml:space="preserve"><value>A .key or .pub file with this name already exists. Choose another name.</value></data>
+  <data name="KeyExportInvalidDirectory" xml:space="preserve"><value>Select an existing output directory.</value></data>
   <data name="Subject" xml:space="preserve"><value>Subject (X.500 distinguished name)</value></data>
   <data name="DnsNames" xml:space="preserve"><value>DNS names (comma separated)</value></data>
   <data name="Validity" xml:space="preserve"><value>Validity (days, 1–3650)</value></data>
@@ -215,7 +225,7 @@
   <data name="InvalidCrcParameters" xml:space="preserve"><value>Invalid CRC parameters. Width must be 1–64 and all values must fit the width; polynomial must be nonzero.</value></data>
   <data name="InvalidCrcHex" xml:space="preserve"><value>Enter a hexadecimal value within the selected width (optional 0x prefix).</value></data>
   <data name="CrcConfiguration" xml:space="preserve"><value>Configuration</value></data>
-  <data name="CrcPresetDescription" xml:space="preserve"><value>Choose a CRC algorithm. Expand to edit its parameters; changes switch to Custom.</value></data>
+  <data name="CrcPresetDescription" xml:space="preserve"><value>Choose a CRC algorithm. Expand to edit its parameters.</value></data>
   <data name="CrcWidthDescription" xml:space="preserve"><value>Number of bits in the CRC result, from 1 to 64.</value></data>
   <data name="CrcInitialDescription" xml:space="preserve"><value>Hex value loaded into the CRC register before processing the input.</value></data>
   <data name="CrcXorOutDescription" xml:space="preserve"><value>Hex value XORed with the CRC after output reflection.</value></data>
