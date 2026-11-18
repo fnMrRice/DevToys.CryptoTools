@@ -7,19 +7,33 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 
 | Group | Tool | Algorithms |
 | --- | --- | --- |
-| Generators | Key generator | RSA 2048/3072/4096; ECDSA and ECDH P-256/P-384/P-521; Ed25519/Ed448; X25519/X448; SM2; AES 128/192/256; ChaCha20; SM4 |
-| Generators | Certificate generator | Self-signed X.509 and PKCS#10 CSR: RSA, ECDSA, Ed25519/Ed448, SM2 with SM3; DNS SANs |
+| Generators | Key generator | RSA 2048/3072/4096; ECDSA/ECDH NIST P-256/P-384/P-521, secp256k1, Brainpool P256r1/P384r1/P512r1; Ed25519/Ed448; X25519/X448; SM2; AES 128/192/256; ChaCha20; SM4 |
+| Generators | Certificate request generator | PKCS#10 CSR from generated or imported key pairs; subject, SAN and requested extensions |
+| Generators | Certificate generator | Self-signed or CA-issued X.509, including issuance from a verified CSR; RSA/RSA-PSS, ECDSA, Ed25519/Ed448 and SM2/SM3 |
 | Cryptography / 加解密 | RSA | OAEP SHA-256/384/512, PKCS#1 v1.5 encryption; PSS and PKCS#1 v1.5 signatures with SHA-256/384/512 |
-| Cryptography / 加解密 | Elliptic curve cryptography | ECDSA, Ed25519/Ed448, SM2 signing/verification; ECDH/X25519/X448 hybrid encryption; SM2 C1C3C2/C1C2C3 encryption |
+| Cryptography / 加解密 | Elliptic curve encryption | ECDH on all listed prime curves, X25519/X448 hybrid encryption; SM2 C1C3C2/C1C2C3 |
+| Cryptography / 加解密 | Elliptic curve signatures | ECDSA on all listed prime curves, Ed25519/Ed448 and SM2; key/certificate or X/Y coordinate verification |
 | Cryptography / 加解密 | Symmetric encryption | AES-GCM/CBC, ChaCha20-Poly1305, SM4-GCM/CBC |
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.2.0.nupkg` from `artifacts/`.
-2. Restart DevToys. Key and certificate tools appear under **Generators**; the other three tools appear under **Cryptography** (加解密 in Chinese).
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.1.nupkg` from `artifacts/`.
+2. Restart DevToys. Key, certificate request and certificate tools appear under **Generators**; RSA, symmetric and the two elliptic curve tools appear under **Cryptography** (加解密 in Chinese).
 3. Generate a key using the algorithm needed by your operation. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV; choose **Base64** when pasting a key from the key generator. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
-5. Certificates and CSRs are PEM text. Save the certificate/request and its matching PKCS#8 private key separately. Every generation creates a new key. Self-signed certificates are intended for local development; CSRs need a CA signature.
+5. Certificates and CSRs are PEM text. Save the certificate/request and its matching PKCS#8 private key separately. A new key is created only when no subject private key is imported. The **Create certificate request** button on the key generator opens the CSR form with the existing pair; **Use CSR to issue certificate** opens certificate issuance with that request. These are the actual destination forms embedded in the current tool with a **Back** button; no clipboard or sidebar navigation is needed. Each form is also available separately in Generators.
+
+## Elliptic curve pages
+
+Both pages use two configuration columns and resizable side-by-side input/output. Drop unencrypted PEM/DER keys or PEM/DER X.509 `.cer` / `.crt` certificates into the file import area; certificates are converted to SPKI public keys. PKCS#8 and SEC1 EC private keys are normalized automatically. Certificates provide public keys for encryption/verification, never private keys for decryption/signing. PFX/PKCS#12 and password-encrypted key files are not supported by this importer.
+
+The signature page offers **X/Y coordinates (Hex)** for ECDSA and SM2 verification, with Hex coordinates interpreted as unsigned big-endian integers (optional whitespace or `0x`). Coordinates are validated against the selected curve and subgroup. Signing requires private-key mode. Ed25519/Ed448 use their standard encoded public keys instead of Cartesian input. The SM2 user ID field appears only when SM2 is selected.
+
+## Certificate and CSR options
+
+The two-column builders expose subject CN/O/OU/C/ST/L plus full DN override; automatic or SHA-256/384/512 signature hashes, RSA-PSS, SAN DNS/IP/email/URI, all nine KU flags, common EKU switches (including document signing), custom EKU OIDs, CA/path length, extension critical flags and a custom OID/Base64-DER extension. Certificate issuance additionally exposes UTC validity dates, random or custom Hex serial numbers and issuer DN. Presets cover TLS server/client, code/document signing, email, timestamping and CA usage; fields remain editable.
+
+Import a private key on the CSR form to sign with an existing pair. Dropping a CSR on the certificate form verifies its signature and loads its editable request fields. An external CSR does not contain a private key: import the matching subject private key to self-sign, or supply an issuer CA certificate and its matching private key to issue it. Issuer key correspondence, CA constraints and validity bounds are checked. Requested extensions are shown as editable options and the certificate is generated only when **Generate certificate** is clicked.
 
 All operations run locally. Inputs, private keys and plaintext are not logged or saved in settings. **Clear** removes the current tool's text; copied clipboard contents remain under your control.
 
@@ -43,7 +57,7 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.2.0.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.1.nupkg
 ```
 
 Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
@@ -53,7 +67,7 @@ The package bundles Bouncy Castle and its license plus the Chinese satellite ass
 ## Project structure
 
 - `src/DevToys.CryptoTools/Cryptography`: cryptographic services.
-- `src/DevToys.CryptoTools/Tools`: five MEF-exported GUI tools.
+- `src/DevToys.CryptoTools/Tools`: seven MEF-exported GUI tools.
 - `src/DevToys.CryptoTools/Localization`: English resources and `Strings.zh-Hans.resx`.
 - `tests/DevToys.CryptoTools.Tests`: algorithm and plugin integration tests.
 
