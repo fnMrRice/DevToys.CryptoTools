@@ -8,11 +8,10 @@ namespace DevToys.CryptoTools.Tests;
 public class SymmetricToolTests
 {
     [Fact]
-    public void UsesTwoConfigurationColumnsResizableEditorsAndHexDefaults()
+    public void UsesResizableEditorsAndHexDefaults()
     {
         var tool = new SymmetricTool();
         Assert.True(tool.View.IsScrollable);
-        Assert.Equal(2, Find<IUIGrid>(tool, "sym-configuration").Columns!.Length);
         var editors = Find<IUISplitGrid>(tool, "sym-editors");
         Assert.Equal(UIOrientation.Vertical, editors.Orientation);
         Assert.Same(Find<IUIMultiLineTextInput>(tool, "sym-input"), editors.LeftOrTopCellContent);
@@ -27,7 +26,6 @@ public class SymmetricToolTests
         }
         foreach (string id in new[] { "sym-algorithm", "sym-mode", "sym-padding" })
             Assert.Equal(UIHorizontalAlignment.Stretch, Find<IUISelectDropDownList>(tool, id).HorizontalAlignment);
-        Assert.Single(Find<IUIGrid>(tool, "sym-settings").Columns!);
     }
 
     [Theory]

@@ -70,20 +70,18 @@ internal sealed class SymmetricTool : CryptoToolBase
         _output.CommandBarExtraContent(Stack().Horizontal().SmallSpacing().WithChildren(
             _outputEncoding, CreateActionButton(L("Clear"), ClearOutput, "sym-clear-output")));
 
-        _algorithm.Title(L("Algorithm"));
-        _keyLength.Title(L("KeyLengthBits"));
-        _mode.Title(L("Mode"));
-        _padding.Title(L("BlockPadding"));
-        var settings = Grid("sym-settings").Columns(Fraction(1)).Rows(Auto, Auto, Auto, Auto).RowMediumSpacing().Cells(
-            At(0, 0, _algorithm), At(1, 0, _keyLength), At(2, 0, _mode), At(3, 0, _padding));
-        var options = settings.AlignVertically(UIVerticalAlignment.Top);
+        var settings = SettingGroup("sym-settings").Title(L("Algorithm")).Icon("FluentSystemIcons", '\uE670')
+            .InteractiveElement(_algorithm).WithSettings(
+                Setting("sym-mode-setting").Title(L("Mode")).Icon("FluentSystemIcons", '\uE670').InteractiveElement(_mode),
+                Setting("sym-padding-setting").Title(L("BlockPadding")).Icon("FluentSystemIcons", '\uE670').InteractiveElement(_padding),
+                Setting("sym-key-length-setting").Title(L("KeyLengthBits")).Icon("FluentSystemIcons", '\uF57D').InteractiveElement(_keyLength));
         _generateIv = CreateActionButton(L("GenerateIv"), GenerateIv, "sym-generate-iv").AlignHorizontally(UIHorizontalAlignment.Left);
         var keyPanel = Stack().Vertical().SmallSpacing().WithChildren(_key, PlaceholderTextInput.Wrap(_iv, L("IvHint"), "sym-iv-placeholder"),
             Stack().Horizontal().SmallSpacing().WithChildren(
                 CreateActionButton(L("GenerateKey"), GenerateKey, "sym-generate-key"), _generateIv))
             .AlignVertically(UIVerticalAlignment.Top);
-        var configuration = Grid("sym-configuration").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing()
-            .AlignVertically(UIVerticalAlignment.Top).Cells(At(0, 0, options), At(0, 1, keyPanel));
+        var configuration = Stack("sym-configuration").Vertical().MediumSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(settings, keyPanel);
         var actions = Stack("sym-actions").Horizontal().SmallSpacing().AlignHorizontally(UIHorizontalAlignment.Left).WithChildren(
             CreateActionButton(L("Encrypt"), () => Transform(true), "sym-encrypt").AccentAppearance(),
             CreateActionButton(L("Decrypt"), () => Transform(false), "sym-decrypt"),
@@ -98,7 +96,6 @@ internal sealed class SymmetricTool : CryptoToolBase
     }
 
     private string CipherAlgorithm => Selected(_algorithm) + "-" + Selected(_mode);
-    private static IUIGridCell At(int row, int column, IUIElement element) => Cell().Row(row).Column(column).WithChild(element);
     private static BinaryEncoding EncodingOf(IUISelectDropDownList choice) => (BinaryEncoding)choice.SelectedItem!.Value!;
     private static IUISelectDropDownList Options(string id, params string[] values) => SelectDropDownList(id)
         .WithItems(values.Select(value => Item(value, value)).ToArray()).Select(0).AlignHorizontally(UIHorizontalAlignment.Stretch);
