@@ -32,6 +32,11 @@
   <data name="KeyExportName" xml:space="preserve"><value>Export file name (without extension)</value></data>
   <data name="KeyExportNameDescription" xml:space="preserve"><value>Choose a folder when exporting. The private key uses .key and the public key uses .pub.</value></data>
   <data name="KeyExportUnavailable" xml:space="preserve"><value>Folder selection is unavailable on this platform.</value></data>
+  <data name="KeyExportDirectory" xml:space="preserve"><value>Output folder</value></data>
+  <data name="KeyExportChooseFolder" xml:space="preserve"><value>Choose folder</value></data>
+  <data name="KeyExportSave" xml:space="preserve"><value>Export</value></data>
+  <data name="KeyExportCancel" xml:space="preserve"><value>Cancel</value></data>
+  <data name="KeyExportFilePreview" xml:space="preserve"><value>Files: {0} and {1}</value></data>
   <data name="KeyExportInvalidName" xml:space="preserve"><value>Enter a valid file name without a path.</value></data>
   <data name="KeyExportMissingKeys" xml:space="preserve"><value>Generate both a private key and a public key before exporting.</value></data>
   <data name="KeyExportFileExists" xml:space="preserve"><value>A .key or .pub file with this name already exists. Choose another name.</value></data>

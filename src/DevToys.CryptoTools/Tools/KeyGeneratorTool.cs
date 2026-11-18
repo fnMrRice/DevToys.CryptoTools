@@ -42,18 +42,10 @@ internal sealed class KeyGeneratorTool : CryptoToolBase
         var algorithmParameters = SettingGroup("key-algorithm-setting")
             .Title(L("Algorithm")).Description(L("KeyNote")).Icon("FluentSystemIcons", '\uE670')
             .InteractiveElement(algorithm);
-        var fixedAlgorithm = Setting("key-algorithm-setting")
-            .Title(L("Algorithm")).Description(L("KeyNote")).Icon("FluentSystemIcons", '\uE670')
-            .InteractiveElement(algorithm);
-        var configuration = Grid("key-configuration");
         var password = PasswordInput("key-password").HideCommandBar();
         var passwordSetting = Setting("key-password-setting")
             .Title(L("KeyPassword")).Description(L("KeyPasswordHint")).Icon("FluentSystemIcons", '\uE670')
             .InteractiveElement(password);
-        var exportName = SingleLineTextInput("key-export-name").Text("keypair").HideCommandBar();
-        var exportNameSetting = Setting("key-export-name-setting")
-            .Title(L("KeyExportName")).Description(L("KeyExportNameDescription")).Icon("FluentSystemIcons", '\uE670')
-            .InteractiveElement(exportName);
         var privateFormat = SelectDropDownList("key-private-format");
         var publicFormat = SelectDropDownList("key-public-format");
         var publicKey = MultiLineTextInput("key-public").Title(L("KeyPublicOutput")).ReadOnly().ShowCommandBar().Extendable().CommandBarExtraContent(publicFormat);
@@ -116,36 +108,31 @@ internal sealed class KeyGeneratorTool : CryptoToolBase
             byte[] privateBytes = [];
             try
             {
-                string baseName = exportName.Text;
                 string privateKeyPem = canonicalPrivateKey;
                 string publicKeyPem = canonicalPublicKey;
                 var selectedPrivateFormat = (KeyOutputFormat)privateFormat.SelectedItem!.Value!;
                 var selectedPublicFormat = (KeyOutputFormat)publicFormat.SelectedItem!.Value!;
-                string? directory = await storage.PickFolderAsync();
-                if (string.IsNullOrWhiteSpace(directory)) return;
                 privateBytes = KeyOutputFormatter.ExportPrivate(privateKeyPem, selectedPrivateFormat);
                 byte[] publicBytes = KeyOutputFormatter.ExportPublic(publicKeyPem, selectedPublicFormat);
-                await KeyPairFileExport.ExportAsync(directory, baseName, privateBytes.AsMemory(), publicBytes.AsMemory());
+                await KeyPairExportDialog.ShowAsync(View, storage, privateBytes.AsMemory(), publicBytes.AsMemory());
             }
             finally { CryptographicOperations.ZeroMemory(privateBytes); SetBusy(false); }
         }));
         void SetBusy(bool value)
         {
             busy = value;
-            foreach (var control in new IUIElement[] { generate, export, send, clear, algorithm, rsaSize, curve, password, exportName, privateFormat, publicFormat })
+            foreach (var control in new IUIElement[] { generate, export, send, clear, algorithm, rsaSize, curve, password, privateFormat, publicFormat })
                 if (value) control.Disable(); else control.Enable();
         }
         void RefreshAlgorithmParameters()
         {
             string family = Selected(algorithm);
-            IUIElement card;
-            if (family is "RSA" or "ECDSA" or "ECDH")
+            algorithmParameters.WithSettings(family switch
             {
-                algorithmParameters.WithSettings(family == "RSA" ? rsaSizeSetting : curveSetting);
-                card = algorithmParameters;
-            }
-            else card = fixedAlgorithm;
-            configuration.Cells(Cell().WithChild(card));
+                "RSA" => [rsaSizeSetting, passwordSetting],
+                "ECDSA" or "ECDH" => [curveSetting, passwordSetting],
+                _ => [passwordSetting]
+            });
         }
         void RefreshFormats()
         {
@@ -182,10 +169,10 @@ internal sealed class KeyGeneratorTool : CryptoToolBase
         var actions = Stack("key-actions").Horizontal().SmallSpacing()
             .AlignHorizontally(UIHorizontalAlignment.Left).WithChildren(generate, export, send, clear);
         var editors = SplitGrid("key-editors").Vertical().WithLeftPaneChild(privateKey).WithRightPaneChild(publicKey);
-        var configurationRows = Stack().Vertical().SmallSpacing().WithChildren(configuration, passwordSetting, exportNameSetting);
-        var layout = Grid("key-layout").Rows(Auto, Auto, Fraction(1), Auto).RowLargeSpacing().Cells(
-            Cell().Row(0).WithChild(configurationRows), Cell().Row(1).WithChild(actions),
-            Cell().Row(2).WithChild(editors), Cell().Row(3).WithChild(Status));
+        var outputArea = Grid("key-output-area").Rows(new UIGridLength(350)).AlignVertically(UIVerticalAlignment.Top)
+            .Cells(Cell().WithChild(editors));
+        var layout = Stack("key-layout").Vertical().MediumSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(algorithmParameters, actions, outputArea, Status);
         _workflow = new WorkflowContainer(layout);
     }
 

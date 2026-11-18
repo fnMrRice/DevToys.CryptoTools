@@ -22,8 +22,7 @@ public class KeyExportUiTests
             string privateKey = Find<IUIMultiLineTextInput>(tool, "key-private").Text;
             string publicKey = Find<IUIMultiLineTextInput>(tool, "key-public").Text;
             Assert.StartsWith("-----BEGIN ENCRYPTED PRIVATE KEY-----", privateKey);
-            Find<IUISingleLineTextInput>(tool, "key-export-name").Text("client-key");
-            await Click(tool, "key-export");
+            await Export(tool, "client-key");
             Assert.Equal(1, storage.PickCount);
             Assert.Equal(privateKey, await File.ReadAllTextAsync(Path.Combine(directory.FullName, "client-key.key")));
             Assert.Equal(publicKey, await File.ReadAllTextAsync(Path.Combine(directory.FullName, "client-key.pub")));
@@ -42,12 +41,45 @@ public class KeyExportUiTests
             var tool = new KeyGeneratorTool { FileStorage = storage };
             SelectEd25519(tool);
             await Click(tool, "key-generate");
-            Find<IUISingleLineTextInput>(tool, "key-export-name").Text(Path.Combine(directory.FullName, "should-not-exist"));
-            await Click(tool, "key-export");
+            var (dialog, exporting) = await StartExport(tool);
+            await DialogClick(dialog, "key-export-browse");
+            Assert.True(dialog.IsOpened);
+            await DialogClick(dialog, "key-export-cancel");
+            await exporting.WaitAsync(TimeSpan.FromSeconds(5));
             Assert.Equal(1, storage.PickCount);
             Assert.Empty(directory.EnumerateFileSystemInfos());
             Assert.True(Find<IUIButton>(tool, "key-generate").IsEnabled);
             Assert.True(Find<IUIButton>(tool, "key-export").IsEnabled);
+        }
+        finally { directory.Delete(true); }
+    }
+
+    [Fact]
+    public async Task AConflictingNameKeepsTheDialogOpenAndCanBeCorrected()
+    {
+        var directory = Directory.CreateTempSubdirectory("DevToys.KeyExportRetry-");
+        try
+        {
+            await File.WriteAllTextAsync(Path.Combine(directory.FullName, "existing.key"), "keep this key");
+            var tool = new KeyGeneratorTool { FileStorage = new FolderPicker(directory.FullName) };
+            SelectEd25519(tool);
+            await Click(tool, "key-generate");
+            var (dialog, exporting) = await StartExport(tool);
+            var name = DialogFind<IUISingleLineTextInput>(dialog, "key-export-name");
+            name.Text("existing");
+            await DialogClick(dialog, "key-export-browse");
+            await DialogClick(dialog, "key-export-save");
+            Assert.True(dialog.IsOpened);
+            Assert.False(exporting.IsCompleted);
+            Assert.True(DialogFind<IUIInfoBar>(dialog, "key-export-error").IsVisible);
+            Assert.Equal("keep this key", await File.ReadAllTextAsync(Path.Combine(directory.FullName, "existing.key")));
+            Assert.False(File.Exists(Path.Combine(directory.FullName, "existing.pub")));
+            name.Text("renamed");
+            await DialogClick(dialog, "key-export-save");
+            await exporting.WaitAsync(TimeSpan.FromSeconds(5));
+            Assert.False(dialog.IsOpened);
+            Assert.Equal(Find<IUIMultiLineTextInput>(tool, "key-private").Text,
+                await File.ReadAllTextAsync(Path.Combine(directory.FullName, "renamed.key")));
         }
         finally { directory.Delete(true); }
     }
@@ -72,7 +104,7 @@ public class KeyExportUiTests
             else original.ImportFromEncryptedPem(generatedPrivateKey, originalPassword);
 
             password.Text(currentPassword);
-            await Click(tool, "key-export");
+            await Export(tool);
             string exported = await File.ReadAllTextAsync(Path.Combine(directory.FullName, "keypair.key"));
             using var restored = RSA.Create();
             if (originalPassword.Length == 0)
@@ -116,7 +148,7 @@ public class KeyExportUiTests
             Select(tool, "key-private-format", (KeyOutputFormat)privateFormatValue);
             Select(tool, "key-public-format", (KeyOutputFormat)publicFormatValue);
             Assert.DoesNotContain(Find<IUISelectDropDownList>(tool, "key-private-format").Items!, item => Equals(item.Value, KeyOutputFormat.TraditionalPem));
-            await Click(tool, "key-export");
+            await Export(tool);
             byte[] privateDer = await File.ReadAllBytesAsync(Path.Combine(directory.FullName, "keypair.key"));
             byte[] publicDer = await File.ReadAllBytesAsync(Path.Combine(directory.FullName, "keypair.pub"));
             Assert.Equal(ReadDer(protectedPem), privateDer);
@@ -140,6 +172,37 @@ public class KeyExportUiTests
     }
     private static T Find<T>(KeyGeneratorTool tool, string id) where T : IUIElement => Assert.IsAssignableFrom<T>(tool.View.GetChildElementById(id));
     private static async Task Click(KeyGeneratorTool tool, string id) => await Find<IUIButton>(tool, id).OnClickAction!();
+    private static async Task Export(KeyGeneratorTool tool, string name = "keypair")
+    {
+        Assert.Null(tool.View.GetChildElementById("key-export-name"));
+        var (dialog, exporting) = await StartExport(tool);
+        Assert.False(exporting.IsCompleted);
+        DialogFind<IUISingleLineTextInput>(dialog, "key-export-name").Text(name);
+        await DialogClick(dialog, "key-export-browse");
+        await DialogClick(dialog, "key-export-save");
+        Assert.False(dialog.IsOpened);
+        await exporting.WaitAsync(TimeSpan.FromSeconds(5));
+    }
+    private static async Task<(UIDialog Dialog, Task Exporting)> StartExport(KeyGeneratorTool tool)
+    {
+        var opened = new TaskCompletionSource<UIDialog>(TaskCreationOptions.RunContinuationsAsynchronously);
+        void OnOpened(object? sender, EventArgs args)
+        {
+            if (tool.View.CurrentOpenedDialog is { } dialog) opened.TrySetResult(dialog);
+        }
+        tool.View.CurrentOpenedDialogChanged += OnOpened;
+        try
+        {
+            Task exporting = Click(tool, "key-export");
+            var dialog = await opened.Task.WaitAsync(TimeSpan.FromSeconds(5));
+            return (dialog, exporting);
+        }
+        finally { tool.View.CurrentOpenedDialogChanged -= OnOpened; }
+    }
+    private static T DialogFind<T>(UIDialog dialog, string id) where T : IUIElement => Assert.IsAssignableFrom<T>(
+        new UIToolView(dialog.DialogContent).GetChildElementById(id) ??
+        (dialog.FooterContent is { } footer ? new UIToolView(footer).GetChildElementById(id) : null));
+    private static async Task DialogClick(UIDialog dialog, string id) => await DialogFind<IUIButton>(dialog, id).OnClickAction!();
     private static void Select(KeyGeneratorTool tool, string id, object value)
     {
         var control = Find<IUISelectDropDownList>(tool, id);

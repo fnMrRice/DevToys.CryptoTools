@@ -32,6 +32,11 @@
   <data name="KeyExportName" xml:space="preserve"><value>导出文件名（不含扩展名）</value></data>
   <data name="KeyExportNameDescription" xml:space="preserve"><value>导出时选择文件夹，私钥自动添加 .key 后缀，公钥自动添加 .pub 后缀。</value></data>
   <data name="KeyExportUnavailable" xml:space="preserve"><value>当前平台不支持选择文件夹。</value></data>
+  <data name="KeyExportDirectory" xml:space="preserve"><value>导出目录</value></data>
+  <data name="KeyExportChooseFolder" xml:space="preserve"><value>选择文件夹</value></data>
+  <data name="KeyExportSave" xml:space="preserve"><value>导出</value></data>
+  <data name="KeyExportCancel" xml:space="preserve"><value>取消</value></data>
+  <data name="KeyExportFilePreview" xml:space="preserve"><value>将导出 {0} 和 {1}</value></data>
   <data name="KeyExportInvalidName" xml:space="preserve"><value>请输入有效的文件名，不要包含路径。</value></data>
   <data name="KeyExportMissingKeys" xml:space="preserve"><value>请先生成完整的私钥和公钥再导出。</value></data>
   <data name="KeyExportFileExists" xml:space="preserve"><value>同名的 .key 或 .pub 文件已存在，请更换名称。</value></data>
