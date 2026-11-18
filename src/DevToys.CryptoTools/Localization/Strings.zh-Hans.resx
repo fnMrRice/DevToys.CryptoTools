@@ -14,7 +14,7 @@
   <data name="EcTitle" xml:space="preserve"><value>椭圆曲线加解密与验签</value></data>
   <data name="EcDescription" xml:space="preserve"><value>ECDSA、EdDSA 签名验签及 ECDH/XDH 混合加解密。</value></data>
   <data name="SymTitle" xml:space="preserve"><value>对称加解密</value></data>
-  <data name="SymDescription" xml:space="preserve"><value>AES-GCM、AES-CBC 与 ChaCha20-Poly1305 加解密。</value></data>
+  <data name="SymDescription" xml:space="preserve"><value>AES、SM4 与 ChaCha20-Poly1305 加解密。</value></data>
   <data name="Algorithm" xml:space="preserve"><value>算法</value></data>
   <data name="Generate" xml:space="preserve"><value>生成</value></data>
   <data name="PublicKey" xml:space="preserve"><value>公钥（SPKI PEM）</value></data>
@@ -47,7 +47,7 @@
   <data name="SigningAlgorithm" xml:space="preserve"><value>签名算法</value></data>
   <data name="EncryptionAlgorithm" xml:space="preserve"><value>加密算法</value></data>
   <data name="EcKeyNote" xml:space="preserve"><value>请使用密钥生成器中与当前操作算法匹配的密钥类型。</value></data>
-  <data name="SymNote" xml:space="preserve"><value>加密 UTF-8 文本并输出带版本的 JSON 密文，粘贴密文进行解密。每次加密自动生成随机 nonce/IV。AES-CBC 不提供身份认证。</value></data>
+  <data name="SymNote" xml:space="preserve"><value>加密 UTF-8 文本并输出带版本的 JSON 密文，粘贴密文进行解密。每次加密自动生成随机 nonce/IV。AES/SM4-CBC 使用 PKCS#7 填充，不提供身份认证。</value></data>
   <data name="InvalidAlgorithm" xml:space="preserve"><value>不支持的算法。</value></data>
   <data name="InvalidKeySize" xml:space="preserve"><value>密钥长度无效。</value></data>
   <data name="InvalidValidity" xml:space="preserve"><value>有效期必须是 1 至 3650 天的整数。</value></data>

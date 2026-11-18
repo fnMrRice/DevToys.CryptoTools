@@ -14,7 +14,7 @@
   <data name="EcTitle" xml:space="preserve"><value>Elliptic curve cryptography</value></data>
   <data name="EcDescription" xml:space="preserve"><value>ECDSA, EdDSA and ECDH/XDH hybrid encryption.</value></data>
   <data name="SymTitle" xml:space="preserve"><value>Symmetric encryption</value></data>
-  <data name="SymDescription" xml:space="preserve"><value>AES-GCM, AES-CBC and ChaCha20-Poly1305 encryption.</value></data>
+  <data name="SymDescription" xml:space="preserve"><value>AES, SM4 and ChaCha20-Poly1305 encryption.</value></data>
   <data name="Algorithm" xml:space="preserve"><value>Algorithm</value></data>
   <data name="Generate" xml:space="preserve"><value>Generate</value></data>
   <data name="PublicKey" xml:space="preserve"><value>Public key (SPKI PEM)</value></data>
@@ -47,7 +47,7 @@
   <data name="SigningAlgorithm" xml:space="preserve"><value>Signing algorithm</value></data>
   <data name="EncryptionAlgorithm" xml:space="preserve"><value>Encryption algorithm</value></data>
   <data name="EcKeyNote" xml:space="preserve"><value>Use a matching key type from the Key generator for the selected operation.</value></data>
-  <data name="SymNote" xml:space="preserve"><value>Encrypt UTF-8 text to a versioned JSON envelope; paste it as input to decrypt. A new random nonce/IV is generated for every encryption. AES-CBC provides no authentication.</value></data>
+  <data name="SymNote" xml:space="preserve"><value>Encrypt UTF-8 text to a versioned JSON envelope; paste it as input to decrypt. A new random nonce/IV is generated for every encryption. AES/SM4-CBC use PKCS#7 padding and provide no authentication.</value></data>
   <data name="InvalidAlgorithm" xml:space="preserve"><value>Unsupported algorithm.</value></data>
   <data name="InvalidKeySize" xml:space="preserve"><value>Invalid key size.</value></data>
   <data name="InvalidValidity" xml:space="preserve"><value>Validity must be an integer from 1 to 3650 days.</value></data>
