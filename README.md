@@ -7,7 +7,7 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 
 | Group | Tool | Algorithms |
 | --- | --- | --- |
-| Generators | Key generator | RSA 2048/3072/4096; ECDSA/ECDH NIST P-256/P-384/P-521, secp256k1, Brainpool P256r1/P384r1/P512r1; Ed25519/Ed448; X25519/X448; SM2; AES 128/192/256; ChaCha20; SM4 |
+| Generators | Key generator | Asymmetric pairs only: RSA 2048/3072/4096; ECDSA/ECDH NIST P-256/P-384/P-521, secp256k1, Brainpool P256r1/P384r1/P512r1; Ed25519/Ed448; X25519/X448; SM2 |
 | Generators | Certificate request generator | PKCS#10 CSR from generated or imported key pairs; subject, SAN and requested extensions |
 | Generators | Certificate generator | Self-signed or CA-issued X.509, including issuance from a verified CSR; RSA/RSA-PSS, ECDSA, Ed25519/Ed448 and SM2/SM3 |
 | Cryptography / 加解密 | RSA algorithms / RSA 算法 | OAEP SHA-256/384/512, PKCS#1 v1.5 encryption; PSS and PKCS#1 v1.5 signatures with SHA-256/384/512; PEM/Base64/Hex public keys, certificates or modulus/exponent |
@@ -16,7 +16,7 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.5.nupkg` from `artifacts/`.
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.6.nupkg` from `artifacts/`.
 2. Restart DevToys. Key, certificate request and certificate tools appear under **Generators**; RSA, symmetric key algorithms and elliptic curve algorithms appear under **Cryptography** (加解密 in Chinese).
 3. Generate a key using the algorithm needed by your operation. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV; choose **Base64** when pasting a key from the key generator. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
@@ -24,7 +24,7 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 
 ## Elliptic curve algorithms
 
-The merged page uses two configuration columns and resizable side-by-side input/output. Select **Encrypt / Decrypt / Sign / Verify** at the upper left. Algorithms are limited to the operations they support; switching between ECDH and ECDSA preserves the selected curve. Encryption and verification show **Public key source** at the upper right; decryption and signing show a separate private-key input. Drop unencrypted PEM/DER keys or PEM/DER X.509 `.cer` / `.crt` certificates into the file import area; certificates are converted to SPKI public keys. PKCS#8 and SEC1 EC private keys are normalized automatically. PFX/PKCS#12 and password-encrypted key files are not supported by this importer.
+The merged page uses two configuration columns and resizable side-by-side input/output. Select **Encrypt / Decrypt / Sign / Verify** at the upper left. Algorithms are limited to the operations they support; switching between ECDH and ECDSA preserves the selected curve. Encryption and verification show **Public key source** in the left parameter column; the right column holds the public key data, encoding and file import. Decryption and signing show a separate private-key input. Drop unencrypted PEM/DER keys or PEM/DER X.509 `.cer` / `.crt` certificates into the file import area; certificates are converted to SPKI public keys. PKCS#8 and SEC1 EC private keys are normalized automatically. PFX/PKCS#12 and password-encrypted key files are not supported by this importer.
 
 Public key data accepts **PEM / Base64 / Hex**. Base64 and Hex can encode SPKI DER, certificate DER or a raw public key: prime-curve SEC1 compressed/uncompressed points or X||Y, Ed25519/Ed448 raw public keys, and X25519/X448 raw public keys. Private material is rejected in public-key mode. Dropping a file resets its encoding to PEM.
 
@@ -65,9 +65,13 @@ All operations run locally. Inputs, private keys and plaintext are not logged or
 | XChaCha20 | Poly1305, Raw |
 | Salsa20, XSalsa20 | Raw |
 
-Only compatible choices are offered. ECB/CBC support PKCS7, None, Zeros, ANSIX923 and ISO10126 padding. Other modes use no padding. Without padding, ECB/CBC input must align to the cipher's block size; zero padding removes all trailing zero bytes on decryption and cannot preserve them unambiguously. DES, TripleDES and RC2 are included for legacy interoperability.
+Only compatible choices are offered. Algorithm, key length, mode and padding use labels above their full-width selectors. Key length is explicitly configured in bits and offers only sizes supported by the selected algorithm; fixed-size algorithms show a single disabled choice. After decoding Hex/Base64/UTF-8 key input, short keys are right-padded with zero bytes and overlong keys have their tail truncated to the selected size. The original input remains unchanged. This key normalization is separate from message padding; select the original key size when decrypting existing ciphertext.
 
-| Algorithm | Accepted key sizes (bytes) |
+**Random key** generates exactly the configured number of random bytes. If Text encoding was selected, generation switches the field to Hex so arbitrary random bytes remain reversible. Symmetric random keys are generated here; the Generators key page only produces asymmetric public/private pairs.
+
+ECB/CBC support PKCS7, None, Zeros, ANSIX923 and ISO10126 message padding. Other modes use no padding. Without padding, ECB/CBC input must align to the cipher's block size; zero padding removes all trailing zero bytes on decryption and cannot preserve them unambiguously. DES, TripleDES and RC2 are included for legacy interoperability.
+
+| Algorithm | Configurable normalized key sizes (bytes; UI displays bits) |
 | --- | --- |
 | AES, Camellia, ARIA, Twofish, Serpent | 16, 24, 32 |
 | SM4 | 16 |
@@ -90,7 +94,7 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.5.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.6.nupkg
 ```
 
 Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
