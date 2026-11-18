@@ -17,9 +17,9 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.9.nupkg` from `artifacts/`.
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.10.nupkg` from `artifacts/`.
 2. Restart DevToys. Key, certificate request, certificate and CRC tools appear under **Generators**; RSA, symmetric key algorithms and elliptic curve algorithms appear under **Cryptography** (加解密 in Chinese).
-3. Generate an asymmetric pair using the algorithm needed by your operation. Choose RSA, ECDSA, ECDH, Ed25519, Ed448, X25519, X448 or SM2 on the algorithm card; expand it to select the RSA key size or EC curve. Actions are above the editors, with the private key on the left and public key on the right. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
+3. Generate an asymmetric pair using the algorithm needed by your operation. Choose RSA, ECDSA, ECDH, Ed25519, Ed448, X25519, X448 or SM2 on the algorithm card; expand it to select the RSA key size, EC curve and optional private key password. Actions are above the editors, with the private key on the left and public key on the right. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
 5. Certificates and CSRs are PEM text. Save the certificate/request and its matching PKCS#8 private key separately. A new key is created only when no subject private key is imported. The **Create certificate request** button on the key generator opens the CSR form with the existing pair; **Use CSR to issue certificate** opens certificate issuance with that request. These are the actual destination forms embedded in the current tool with a **Back** button; no clipboard or sidebar navigation is needed. Each form is also available separately in Generators.
 
@@ -27,7 +27,7 @@ The key generator accepts an optional password. When generating, leaving it empt
 
 Each key editor has its own output format selector. Switching formats converts the existing key without generating a new pair or changing its password. Private keys support PKCS#8 PEM and DER shown as Hex or Base64; unencrypted RSA and EC keys also support traditional PKCS#1 / SEC1 PEM. Public keys support SubjectPublicKeyInfo PEM and DER shown as Hex or Base64; RSA public keys can also use PKCS#1 PEM. Password-protected private keys retain their encrypted PKCS#8 structure in both PEM and DER.
 
-Set the export base file name, then click **Export key pair** and choose a directory in the native folder picker. Files are saved as `<name>.key` (private) and `<name>.pub` (public), using each editor's selected format. PEM exports are text; DER exports contain the binary DER bytes, regardless of whether the editor displays them as Hex or Base64. Existing files are not overwritten; choose another name if either file already exists.
+Click **Export key pair** to open the export dialog. Enter the base file name and choose an output directory there, then confirm **Export**. Files are saved as `<name>.key` (private) and `<name>.pub` (public), using each editor's selected format. PEM exports are text; DER exports contain the binary DER bytes, regardless of whether the editor displays them as Hex or Base64. Existing files are not overwritten; a conflict keeps the dialog open so the name can be corrected. Cancelling the dialog writes no files.
 
 ## Elliptic curve algorithms
 
@@ -111,7 +111,7 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.9.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.10.nupkg
 ```
 
 Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation, CRC preset checks, streamed file input, checksum comparison and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
