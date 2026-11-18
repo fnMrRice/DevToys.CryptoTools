@@ -8,7 +8,7 @@
   <data name="KeyTitle" xml:space="preserve"><value>密钥生成</value></data>
   <data name="KeyDescription" xml:space="preserve"><value>生成 RSA、椭圆曲线及对称密钥。</value></data>
   <data name="CertTitle" xml:space="preserve"><value>证书生成</value></data>
-  <data name="CertDescription" xml:space="preserve"><value>生成自签名 X.509 证书和 PKCS#10 证书请求。</value></data>
+  <data name="CertDescription" xml:space="preserve"><value>配置并生成 X.509 证书，支持自签名和 CA 根据 CSR 签发。</value></data>
   <data name="RsaTitle" xml:space="preserve"><value>RSA 加解密与验签</value></data>
   <data name="RsaDescription" xml:space="preserve"><value>RSA 加密、解密、签名与验签。</value></data>
   <data name="EcTitle" xml:space="preserve"><value>椭圆曲线加解密与验签</value></data>
@@ -26,7 +26,7 @@
   <data name="Validity" xml:space="preserve"><value>有效期（天，1–3650）</value></data>
   <data name="Certificate" xml:space="preserve"><value>证书（PEM）</value></data>
   <data name="Csr" xml:space="preserve"><value>证书请求（PKCS#10 PEM）</value></data>
-  <data name="GenerateCert" xml:space="preserve"><value>生成自签名证书</value></data>
+  <data name="GenerateCert" xml:space="preserve"><value>生成证书</value></data>
   <data name="GenerateCsr" xml:space="preserve"><value>生成证书请求</value></data>
   <data name="CertNote" xml:space="preserve"><value>每次操作生成新密钥。自签名证书用于本地开发；证书请求需要 CA 签发。</value></data>
   <data name="KeyPem" xml:space="preserve"><value>密钥（PEM；加密/验签用公钥，解密/签名用私钥）</value></data>
@@ -168,7 +168,7 @@
   <data name="CertInvalidDate" xml:space="preserve"><value>请输入有效的 UTC 日期时间，例如 2026-11-18 08:00:00Z。</value></data>
   <data name="CertIssuerCertificate" xml:space="preserve"><value>颁发者证书（PEM）</value></data>
   <data name="CertUseIssuer" xml:space="preserve"><value>使用颁发者 CA 证书和私钥签发</value></data>
-  <data name="CertCsrImportHint" xml:space="preserve"><value>可选：导入 PEM/DER CSR，加载主体与 SAN 后签发证书。</value></data>
+  <data name="CertCsrImportHint" xml:space="preserve"><value>导入 PEM/DER CSR 加载可编辑字段。自签名需要配对的主体私钥；CA 签发需要颁发者证书和私钥。</value></data>
   <data name="CertReadCsr" xml:space="preserve"><value>加载 CSR 字段</value></data>
   <data name="CertRequestSection" xml:space="preserve"><value>根据证书请求签发（可选）</value></data>
   <data name="CsrTitle" xml:space="preserve"><value>证书请求生成</value></data>
@@ -176,4 +176,9 @@
   <data name="CertIssueCsr" xml:space="preserve"><value>使用 CSR 签发证书</value></data>
   <data name="CsrBuilderHint" xml:space="preserve"><value>使用所选主体、SAN 和扩展生成 PKCS#10 CSR，私钥保留在本地。</value></data>
   <data name="CertGenerateCsrFirst" xml:space="preserve"><value>请先生成 CSR，再进入证书签发。</value></data>
+  <data name="CertCustomExtensionsFormat" xml:space="preserve"><value>其他扩展：每行 OID|true/false|Base64 DER</value></data>
+  <data name="CertInvalidExtension" xml:space="preserve"><value>每个自定义扩展必须使用 OID|true/false|Base64 DER 格式。</value></data>
+  <data name="CertEnabled" xml:space="preserve"><value>启用</value></data>
+  <data name="CertDisabled" xml:space="preserve"><value>禁用</value></data>
+  <data name="EcSm2EncryptHint" xml:space="preserve"><value>SM2 使用 sm2p256v1 和 SM3；密文为 C1C3C2 或 C1C2C3 的 Base64，C1 为非压缩点。</value></data>
 </root>

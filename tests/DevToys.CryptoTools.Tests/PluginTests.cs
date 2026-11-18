@@ -11,12 +11,12 @@ namespace DevToys.CryptoTools.Tests;
 public class PluginTests
 {
     [Fact]
-    public void MefDiscoversFiveToolsInTheRequestedGroups()
+    public void MefDiscoversSevenToolsInTheRequestedGroups()
     {
         using var catalog = new AssemblyCatalog(typeof(KeyGeneratorTool).Assembly);
         using var container = new CompositionContainer(catalog);
         var tools = container.GetExportedValues<IGuiTool>().ToArray();
-        Assert.Equal(5, tools.Length);
+        Assert.Equal(7, tools.Length);
         Assert.Single(container.GetExportedValues<IResourceAssemblyIdentifier>());
         Assert.Single(container.GetExportedValues<GuiToolGroup>());
         foreach (var tool in tools)
@@ -24,7 +24,7 @@ public class PluginTests
             Assert.Same(tool.View, tool.View);
             Assert.IsAssignableFrom<IUIElementWithChildren>(tool.View.RootElement);
             var metadata = tool.GetType().GetCustomAttribute<ToolDisplayInformationAttribute>()!;
-            string expected = tool is KeyGeneratorTool or CertificateGeneratorTool
+            string expected = tool is KeyGeneratorTool or CertificateGeneratorTool or CertificateRequestTool
                 ? PredefinedCommonToolGroupNames.Generators : CryptographyToolGroup.GroupName;
             Assert.Equal(expected, metadata.GroupName);
             Assert.Equal(Text.ResourceBaseName, metadata.ResourceManagerBaseName);

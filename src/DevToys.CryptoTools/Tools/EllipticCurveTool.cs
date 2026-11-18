@@ -13,29 +13,26 @@ namespace DevToys.CryptoTools.Tools;
     GroupName = CryptographyToolGroup.GroupName,
     ResourceManagerAssemblyIdentifier = nameof(CryptoToolsResourceAssemblyIdentifier),
     ResourceManagerBaseName = ResourceBaseName,
-    ShortDisplayTitleResourceName = "EcTitle",
-    LongDisplayTitleResourceName = "EcTitle",
-    DescriptionResourceName = "EcDescription",
-    AccessibleNameResourceName = "EcTitle")]
-internal sealed class EllipticCurveTool : CryptoToolBase
+    ShortDisplayTitleResourceName = "EcEncryptionTitle",
+    LongDisplayTitleResourceName = "EcEncryptionTitle",
+    DescriptionResourceName = "EcEncryptionDescription",
+    AccessibleNameResourceName = "EcEncryptionTitle")]
+internal sealed class EllipticCurveTool : EllipticCurvePageBase
 {
-    public EllipticCurveTool()
+    public EllipticCurveTool() : base("ec-encryption", EllipticCurveCryptography.EncryptionAlgorithms)
     {
-        Note(L("EcNote"));
-        Note(L("EcKeyNote"));
-        Note(L("Sm2Note"));
-        var signing = Choice(L("SigningAlgorithm"), EllipticCurveCryptography.SigningAlgorithms);
-        var encryption = Choice(L("EncryptionAlgorithm"), EllipticCurveCryptography.EncryptionAlgorithms);
-        var sm2Id = Input(L("Sm2Id"), "1234567812345678");
-        var key = Editor(L("KeyPem"));
-        var input = Editor(L("Input"));
-        var signature = Editor(L("Signature"));
-        var output = Editor(L("Output"), true);
-        void Run(Func<string> action) { output.Text(""); output.Text(action()); }
-        ActionButton(L("Encrypt"), () => Run(() => EllipticCurveCryptography.Encrypt(Selected(encryption), key.Text ?? "", input.Text ?? "")));
-        ActionButton(L("Decrypt"), () => Run(() => EllipticCurveCryptography.Decrypt(Selected(encryption), key.Text ?? "", input.Text ?? "")));
-        ActionButton(L("Sign"), () => Run(() => EllipticCurveCryptography.Sign(Selected(signing), key.Text ?? "", input.Text ?? "", sm2Id.Text ?? "")));
-        ActionButton(L("Verify"), () => Run(() => L(EllipticCurveCryptography.Verify(Selected(signing), key.Text ?? "", input.Text ?? "", signature.Text ?? "", sm2Id.Text ?? "") ? "Valid" : "Invalid")));
-        ActionButton(L("Clear"), () => { key.Text(""); input.Text(""); signature.Text(""); output.Text(""); });
+        var sm2Hint = Label().Text(L("EcSm2EncryptHint")).AlignHorizontally(UIHorizontalAlignment.Left).Hide();
+        Algorithm.OnItemSelected(_ =>
+        {
+            if (Selected(Algorithm).StartsWith("SM2-", StringComparison.Ordinal)) sm2Hint.Show(); else sm2Hint.Hide();
+            OutputText.Text("");
+        });
+        var options = Stack().Vertical().MediumSpacing().WithChildren(Algorithm,
+            Label().Text(L("EcEncryptHint")).AlignHorizontally(UIHorizontalAlignment.Left), sm2Hint);
+        SetLayout("ec-encryption", options, KeyInput.View, InputText,
+            CreateActionButton(L("Encrypt"), () => ShowResult(() => EllipticCurveCryptography.Encrypt(Selected(Algorithm), KeyInput.GetPem(), InputText.Text)), "ec-encryption-encrypt").AccentAppearance(),
+            CreateActionButton(L("Decrypt"), () => ShowResult(() => EllipticCurveCryptography.Decrypt(Selected(Algorithm), KeyInput.GetPem(), InputText.Text)), "ec-encryption-decrypt"),
+            CreateActionButton(L("UseOutputAsInput"), () => { InputText.Text(OutputText.Text); OutputText.Text(""); }, "ec-encryption-use-output"),
+            CreateActionButton(L("Clear"), () => { KeyInput.Clear(); InputText.Text(""); OutputText.Text(""); }, "ec-encryption-clear"));
     }
 }

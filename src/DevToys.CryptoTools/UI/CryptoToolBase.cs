@@ -53,5 +53,19 @@ internal abstract class CryptoToolBase : IGuiTool
         }
     }
 
-    public void OnDataReceived(string dataTypeName, object? parsedData) { }
+    protected async ValueTask ExecuteAsync(Func<ValueTask> action)
+    {
+        Status.Hide();
+        try
+        {
+            await action();
+            Status.Description(L("Completed")).Success().Show();
+        }
+        catch (Exception ex) when (ex is CryptographicException or ArgumentException or FormatException or InvalidOperationException or NotSupportedException or System.Text.Json.JsonException or Org.BouncyCastle.Crypto.CryptoException or IOException or UnauthorizedAccessException)
+        {
+            Status.Description(ex.Message).Error().Show();
+        }
+    }
+
+    public virtual void OnDataReceived(string dataTypeName, object? parsedData) { }
 }

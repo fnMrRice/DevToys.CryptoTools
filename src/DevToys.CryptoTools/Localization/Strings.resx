@@ -8,7 +8,7 @@
   <data name="KeyTitle" xml:space="preserve"><value>Key generator</value></data>
   <data name="KeyDescription" xml:space="preserve"><value>Generate RSA, elliptic curve and symmetric keys.</value></data>
   <data name="CertTitle" xml:space="preserve"><value>Certificate generator</value></data>
-  <data name="CertDescription" xml:space="preserve"><value>Generate self-signed X.509 certificates and PKCS#10 requests.</value></data>
+  <data name="CertDescription" xml:space="preserve"><value>Generate configurable X.509 certificates, self-signed or issued from a CSR by a CA.</value></data>
   <data name="RsaTitle" xml:space="preserve"><value>RSA</value></data>
   <data name="RsaDescription" xml:space="preserve"><value>RSA encryption, decryption, signing and verification.</value></data>
   <data name="EcTitle" xml:space="preserve"><value>Elliptic curve cryptography</value></data>
@@ -26,7 +26,7 @@
   <data name="Validity" xml:space="preserve"><value>Validity (days, 1–3650)</value></data>
   <data name="Certificate" xml:space="preserve"><value>Certificate (PEM)</value></data>
   <data name="Csr" xml:space="preserve"><value>Certificate request (PKCS#10 PEM)</value></data>
-  <data name="GenerateCert" xml:space="preserve"><value>Generate self-signed certificate</value></data>
+  <data name="GenerateCert" xml:space="preserve"><value>Generate certificate</value></data>
   <data name="GenerateCsr" xml:space="preserve"><value>Generate certificate request</value></data>
   <data name="CertNote" xml:space="preserve"><value>Creates a new key for each operation. Self-signed certificates are for local development; CSR output requires a CA signature.</value></data>
   <data name="KeyPem" xml:space="preserve"><value>Key (PEM; public key to encrypt/verify, private key to decrypt/sign)</value></data>
@@ -168,7 +168,7 @@
   <data name="CertInvalidDate" xml:space="preserve"><value>Enter a valid UTC date and time, e.g. 2026-11-18 08:00:00Z.</value></data>
   <data name="CertIssuerCertificate" xml:space="preserve"><value>Issuer certificate (PEM)</value></data>
   <data name="CertUseIssuer" xml:space="preserve"><value>Sign with an issuer CA certificate and private key</value></data>
-  <data name="CertCsrImportHint" xml:space="preserve"><value>Optional: import a PEM / DER CSR and load its subject and SANs before issuing.</value></data>
+  <data name="CertCsrImportHint" xml:space="preserve"><value>Import a PEM / DER CSR to load its editable fields. Self-signing needs the matching subject private key; CA issuance needs an issuer certificate and private key.</value></data>
   <data name="CertReadCsr" xml:space="preserve"><value>Load CSR fields</value></data>
   <data name="CertRequestSection" xml:space="preserve"><value>Issue from a certificate request (optional)</value></data>
   <data name="CsrTitle" xml:space="preserve"><value>Certificate request generator</value></data>
@@ -176,4 +176,9 @@
   <data name="CertIssueCsr" xml:space="preserve"><value>Use CSR to issue certificate</value></data>
   <data name="CsrBuilderHint" xml:space="preserve"><value>Generate a PKCS#10 CSR with the selected subject, SANs and extensions. The private key stays local.</value></data>
   <data name="CertGenerateCsrFirst" xml:space="preserve"><value>Generate a CSR before opening certificate issuance.</value></data>
+  <data name="CertCustomExtensionsFormat" xml:space="preserve"><value>Additional extensions: one OID|true/false|Base64 DER per line</value></data>
+  <data name="CertInvalidExtension" xml:space="preserve"><value>Each custom extension must contain OID|true/false|Base64 DER.</value></data>
+  <data name="CertEnabled" xml:space="preserve"><value>Enabled</value></data>
+  <data name="CertDisabled" xml:space="preserve"><value>Disabled</value></data>
+  <data name="EcSm2EncryptHint" xml:space="preserve"><value>SM2 uses sm2p256v1 and SM3. Ciphertext is Base64 C1C3C2 or C1C2C3 with an uncompressed C1 point.</value></data>
 </root>
