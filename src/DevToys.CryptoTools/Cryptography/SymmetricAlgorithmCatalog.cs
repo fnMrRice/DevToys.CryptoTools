@@ -58,18 +58,22 @@ internal static class SymmetricAlgorithmCatalog
         return algorithm.Mode switch { "GCM" or "CCM" or "Poly1305" => 16, "EAX" => algorithm.BlockSize, _ => 0 };
     }
 
-    internal static bool IsKeyLengthValid(string fullAlgorithm, int bytes) => Resolve(fullAlgorithm).Algorithm switch
+    internal static int[] KeyLengths(string algorithm) => algorithm switch
     {
-        "AES" or "Camellia" or "ARIA" or "Twofish" or "Serpent" => bytes is 16 or 24 or 32,
-        "SM4" => bytes == 16,
-        "Blowfish" => bytes is >= 4 and <= 56,
-        "CAST5" => bytes is >= 5 and <= 16,
-        "DES" => bytes == 8,
-        "TripleDES" => bytes is 16 or 24,
-        "RC2" => bytes is >= 1 and <= 128,
-        "Salsa20" => bytes is 16 or 32,
-        _ => bytes == 32
+        "AES" or "Camellia" or "ARIA" or "Twofish" or "Serpent" => [16, 24, 32],
+        "SM4" => [16],
+        "Blowfish" => Enumerable.Range(4, 53).ToArray(),
+        "CAST5" => Enumerable.Range(5, 12).ToArray(),
+        "DES" => [8],
+        "TripleDES" => [16, 24],
+        "RC2" => Enumerable.Range(1, 128).ToArray(),
+        "Salsa20" => [16, 32],
+        "ChaCha20" or "XChaCha20" or "XSalsa20" => [32],
+        _ => throw new ArgumentException(L("InvalidAlgorithm"))
     };
+
+    internal static bool IsKeyLengthValid(string fullAlgorithm, int bytes) =>
+        KeyLengths(Resolve(fullAlgorithm).Algorithm).Contains(bytes);
 
     internal static int DefaultKeyLength(string algorithm) => algorithm switch
     {

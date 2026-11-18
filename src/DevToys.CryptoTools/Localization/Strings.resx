@@ -6,7 +6,7 @@
   <data name="Completed" xml:space="preserve"><value>Operation completed.</value></data>
   <data name="Cryptography" xml:space="preserve"><value>Cryptography</value></data>
   <data name="KeyTitle" xml:space="preserve"><value>Key generator</value></data>
-  <data name="KeyDescription" xml:space="preserve"><value>Generate RSA, elliptic curve and symmetric keys.</value></data>
+  <data name="KeyDescription" xml:space="preserve"><value>Generate RSA and elliptic curve asymmetric key pairs.</value></data>
   <data name="CertTitle" xml:space="preserve"><value>Certificate generator</value></data>
   <data name="CertDescription" xml:space="preserve"><value>Generate configurable X.509 certificates, self-signed or issued from a CSR by a CA.</value></data>
   <data name="RsaTitle" xml:space="preserve"><value>RSA algorithms</value></data>
@@ -198,4 +198,6 @@
   <data name="RsaExponent" xml:space="preserve"><value>Public exponent (e)</value></data>
   <data name="RsaPublicImportHint" xml:space="preserve"><value>Drop an RSA public key or certificate, or enter PEM / Base64 / Hex public key data.</value></data>
   <data name="RsaPrivateImportHint" xml:space="preserve"><value>Drop an unencrypted PKCS#8 / PKCS#1 RSA private key (PEM/DER), or paste PEM text.</value></data>
+  <data name="KeyLengthBits" xml:space="preserve"><value>Key length (bits)</value></data>
+  <data name="GenerateKey" xml:space="preserve"><value>Random key</value></data>
 </root>

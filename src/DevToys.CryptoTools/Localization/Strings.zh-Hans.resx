@@ -6,7 +6,7 @@
   <data name="Completed" xml:space="preserve"><value>操作完成。</value></data>
   <data name="Cryptography" xml:space="preserve"><value>加解密</value></data>
   <data name="KeyTitle" xml:space="preserve"><value>密钥生成</value></data>
-  <data name="KeyDescription" xml:space="preserve"><value>生成 RSA、椭圆曲线及对称密钥。</value></data>
+  <data name="KeyDescription" xml:space="preserve"><value>生成 RSA、椭圆曲线等非对称算法的公私钥对。</value></data>
   <data name="CertTitle" xml:space="preserve"><value>证书生成</value></data>
   <data name="CertDescription" xml:space="preserve"><value>配置并生成 X.509 证书，支持自签名和 CA 根据 CSR 签发。</value></data>
   <data name="RsaTitle" xml:space="preserve"><value>RSA 算法</value></data>
@@ -198,4 +198,6 @@
   <data name="RsaExponent" xml:space="preserve"><value>公钥指数（e）</value></data>
   <data name="RsaPublicImportHint" xml:space="preserve"><value>拖入 RSA 公钥或证书，或输入 PEM / Base64 / Hex 公钥数据。</value></data>
   <data name="RsaPrivateImportHint" xml:space="preserve"><value>拖入未加密的 PKCS#8 / PKCS#1 RSA 私钥（PEM/DER），或粘贴 PEM 文本。</value></data>
+  <data name="KeyLengthBits" xml:space="preserve"><value>密钥长度（位）</value></data>
+  <data name="GenerateKey" xml:space="preserve"><value>随机密钥</value></data>
 </root>
