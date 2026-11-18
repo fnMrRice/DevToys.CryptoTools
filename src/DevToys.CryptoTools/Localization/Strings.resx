@@ -202,7 +202,7 @@
   <data name="GenerateKey" xml:space="preserve"><value>Random key</value></data>
   <data name="CrcTitle" xml:space="preserve"><value>Cyclic redundancy check (CRC)</value></data>
   <data name="CrcDescription" xml:space="preserve"><value>Calculate CRCs using standard presets or custom polynomials and parameters.</value></data>
-  <data name="CrcPreset" xml:space="preserve"><value>Preset</value></data>
+  <data name="CrcPreset" xml:space="preserve"><value>CRC algorithm</value></data>
   <data name="CrcCustom" xml:space="preserve"><value>Custom</value></data>
   <data name="CrcWidth" xml:space="preserve"><value>Width (1–64 bits)</value></data>
   <data name="CrcPolynomial" xml:space="preserve"><value>Polynomial (Hex)</value></data>
@@ -211,12 +211,22 @@
   <data name="CrcReflectInput" xml:space="preserve"><value>Reflect input (RefIn)</value></data>
   <data name="CrcReflectOutput" xml:space="preserve"><value>Reflect output (RefOut)</value></data>
   <data name="CrcCheck" xml:space="preserve"><value>Preset check for 123456789 (Hex)</value></data>
-  <data name="CrcOutputFormat" xml:space="preserve"><value>Output format</value></data>
-  <data name="CrcDecimal" xml:space="preserve"><value>Decimal</value></data>
-  <data name="CrcBinary" xml:space="preserve"><value>Binary</value></data>
-  <data name="CrcBase64" xml:space="preserve"><value>Base64 (big-endian bytes)</value></data>
-  <data name="CrcCalculate" xml:space="preserve"><value>Calculate CRC</value></data>
-  <data name="CrcPolynomialHint" xml:space="preserve"><value>Enter the polynomial in normal Hex notation, omitting the highest x^width term. Reflection is controlled by RefIn/RefOut; editing a parameter switches to Custom.</value></data>
+  <data name="CrcPolynomialHint" xml:space="preserve"><value>Normal Hex representation, without the highest x^width term. An optional 0x prefix is accepted.</value></data>
   <data name="InvalidCrcParameters" xml:space="preserve"><value>Invalid CRC parameters. Width must be 1–64 and all values must fit the width; polynomial must be nonzero.</value></data>
   <data name="InvalidCrcHex" xml:space="preserve"><value>Enter a hexadecimal value within the selected width (optional 0x prefix).</value></data>
+  <data name="CrcConfiguration" xml:space="preserve"><value>Configuration</value></data>
+  <data name="CrcPresetDescription" xml:space="preserve"><value>Choose a CRC algorithm. Expand to edit its parameters; changes switch to Custom.</value></data>
+  <data name="CrcWidthDescription" xml:space="preserve"><value>Number of bits in the CRC result, from 1 to 64.</value></data>
+  <data name="CrcInitialDescription" xml:space="preserve"><value>Hex value loaded into the CRC register before processing the input.</value></data>
+  <data name="CrcXorOutDescription" xml:space="preserve"><value>Hex value XORed with the CRC after output reflection.</value></data>
+  <data name="CrcReflectInputDescription" xml:space="preserve"><value>Process each input byte from its least significant bit.</value></data>
+  <data name="CrcReflectOutputDescription" xml:space="preserve"><value>Reverse the CRC register bits before applying the final XOR.</value></data>
+  <data name="CrcCheckDescription" xml:space="preserve"><value>Standard result for ASCII 123456789. Cleared when parameters are customized.</value></data>
+  <data name="CrcOutputHex" xml:space="preserve"><value>Output (Hex)</value></data>
+  <data name="CrcExpected" xml:space="preserve"><value>Checksum to verify (Hex)</value></data>
+  <data name="CrcVerification" xml:space="preserve"><value>Checksum verification</value></data>
+  <data name="CrcMatches" xml:space="preserve"><value>The checksums match.</value></data>
+  <data name="CrcDoesNotMatch" xml:space="preserve"><value>The checksums do not match.</value></data>
+  <data name="CrcOr" xml:space="preserve"><value>or</value></data>
+  <data name="CrcClearFile" xml:space="preserve"><value>Clear file</value></data>
 </root>

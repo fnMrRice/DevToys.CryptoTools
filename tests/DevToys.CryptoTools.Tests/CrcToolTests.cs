@@ -14,9 +14,7 @@ public class CrcToolTests
     public async Task DefaultCrc32AcceptsAllInputEncodings(int encoding, string input)
     {
         var tool = new CrcTool();
-        Assert.False(tool.View.IsScrollable);
-        Assert.Equal(2, Find<IUIGrid>(tool, "crc-configuration").Columns!.Length);
-        Assert.Equal(UIOrientation.Vertical, Find<IUISplitGrid>(tool, "crc-editors").Orientation);
+        Assert.True(tool.View.IsScrollable);
         Select(tool, "crc-input-encoding", (BinaryEncoding)encoding);
         Find<IUIMultiLineTextInput>(tool, "crc-input").Text(input);
         await Calculate(tool);
@@ -39,24 +37,20 @@ public class CrcToolTests
         await Calculate(tool);
         Assert.Equal("29B1", Result(tool));
         Select(tool, "crc-preset", "CRC-16/MODBUS");
-        Assert.Empty(Result(tool));
         await Calculate(tool);
         Assert.Equal("4B37", Result(tool));
     }
 
     [Fact]
-    public async Task OutputCanBeChangedWithoutRecalculatingAndInputEditsInvalidateIt()
+    public async Task InputEditsAutomaticallyUpdateHexResult()
     {
         var tool = new CrcTool();
         await Calculate(tool);
-        Select(tool, "crc-output-format", "decimal");
-        Assert.Equal("3421780262", Result(tool));
-        Select(tool, "crc-output-format", "binary");
-        Assert.Equal("11001011111101000011100100100110", Result(tool));
-        Select(tool, "crc-output-format", "base64");
-        Assert.Equal(Convert.ToBase64String(Convert.FromHexString("CBF43926")), Result(tool));
+        Assert.Equal("CBF43926", Result(tool));
         Find<IUIMultiLineTextInput>(tool, "crc-input").Text("changed");
-        Assert.Empty(Result(tool));
+        await Calculate(tool);
+        Assert.NotEmpty(Result(tool));
+        Assert.NotEqual("CBF43926", Result(tool));
     }
 
     [Fact]
@@ -66,13 +60,8 @@ public class CrcToolTests
         Select(tool, "crc-preset", "CRC-64/XZ");
         await Calculate(tool);
         Assert.Equal("995DC9BBDF1939FA", Result(tool));
-        Select(tool, "crc-output-format", "binary");
-        Assert.Equal(64, Result(tool).Length);
-        Assert.StartsWith("10011001", Result(tool));
         Select(tool, "crc-preset", "CRC-3/GSM");
         await Calculate(tool);
-        Assert.Equal("100", Result(tool));
-        Select(tool, "crc-output-format", "hex");
         Assert.Equal("4", Result(tool));
     }
 
@@ -90,11 +79,30 @@ public class CrcToolTests
     }
 
     private static T Find<T>(CrcTool tool, string id) where T : IUIElement => Assert.IsAssignableFrom<T>(tool.View.GetChildElementById(id));
-    private static string Result(CrcTool tool) => Find<IUIMultiLineTextInput>(tool, "crc-output").Text;
+    [Theory]
+    [InlineData("cbf43926", "CrcMatches")]
+    [InlineData("0xCBF43926", "CrcMatches")]
+    [InlineData("00000000", "CrcDoesNotMatch")]
+    [InlineData("100000000", "InvalidCrcHex")]
+    public async Task ExpectedHexChecksumIsAutomaticallyComparedWhenInputChanges(string expected, string message)
+    {
+        var tool = new CrcTool();
+        Find<IUISingleLineTextInput>(tool, "crc-expected").Text(expected);
+        await Calculate(tool);
+        var verification = Find<IUIInfoBar>(tool, "crc-verification");
+        Assert.True(verification.IsVisible);
+        Assert.Equal(DevToys.CryptoTools.Localization.Text.L(message), verification.Description);
+        Find<IUIMultiLineTextInput>(tool, "crc-input").Text("changed");
+        await Calculate(tool);
+        Assert.True(verification.IsVisible);
+        Assert.NotEqual("CBF43926", Result(tool));
+    }
+
+    private static string Result(CrcTool tool) => Find<IUISingleLineTextInput>(tool, "crc-output").Text;
     private static void Select(CrcTool tool, string id, object value)
     {
         var choice = Find<IUISelectDropDownList>(tool, id);
         choice.Select(choice.Items!.Single(item => Equals(item.Value, value)));
     }
-    private static async Task Calculate(CrcTool tool) => await Find<IUIButton>(tool, "crc-calculate").OnClickAction!();
+    private static async Task Calculate(CrcTool tool) => await tool.CalculationTask;
 }
