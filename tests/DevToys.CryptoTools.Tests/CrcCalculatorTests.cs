@@ -7,12 +7,99 @@ public class CrcCalculatorTests
     public static IEnumerable<object[]> PresetNames =>
         CrcCalculator.Presets.Select(preset => new object[] { preset.Name });
 
+    public static IEnumerable<object[]> StreamPresetCases =>
+        CrcCalculator.Presets.SelectMany(preset => new[] { 1, 2, 4, 65536 }
+            .Select(chunkSize => new object[] { preset.Name, chunkSize }));
+
     [Theory]
     [MemberData(nameof(PresetNames))]
     public void PresetsMatchPublishedRevEngCheckValues(string name)
     {
         CrcPreset preset = Assert.Single(CrcCalculator.Presets, item => item.Name == name);
         Assert.Equal(preset.Check, CrcCalculator.Compute("123456789"u8, preset.Parameters));
+    }
+
+    [Theory]
+    [MemberData(nameof(StreamPresetCases))]
+    public async Task StreamingPresetsMatchPublishedCheckAcrossShortReads(string name, int chunkSize)
+    {
+        CrcPreset preset = Assert.Single(CrcCalculator.Presets, item => item.Name == name);
+        using var stream = new ChunkedReadStream("123456789"u8.ToArray(), chunkSize);
+        Assert.Equal(preset.Check, await CrcCalculator.ComputeAsync(stream, preset.Parameters));
+        Assert.False(stream.IsDisposed);
+        Assert.True(stream.ReadCalls >= 2);
+    }
+
+    [Theory]
+    [InlineData(4093)]
+    [InlineData(16384)]
+    [InlineData(262144)]
+    public async Task StreamingProcessesMultipleBoundedBlocksWithoutSeeking(int chunkSize)
+    {
+        byte[] data = Enumerable.Range(0, 128 * 1024 + 17).Select(index => (byte)(index % 251)).ToArray();
+        foreach (string name in new[] { "CRC-3/GSM", "CRC-12/UMTS", "CRC-64/XZ" })
+        {
+            CrcPreset preset = Assert.Single(CrcCalculator.Presets, item => item.Name == name);
+            using var stream = new ChunkedReadStream(data, chunkSize);
+            Assert.Equal(CrcCalculator.Compute(data, preset.Parameters), await CrcCalculator.ComputeAsync(stream, preset.Parameters));
+            Assert.True(stream.ReadCalls > 2);
+            Assert.InRange(stream.LargestReadRequest, 1, 64 * 1024);
+            Assert.False(stream.IsDisposed);
+        }
+    }
+
+    [Fact]
+    public async Task StreamingBeginsAtTheCurrentPositionAndLeavesTheStreamOpen()
+    {
+        CrcPreset preset = Assert.Single(CrcCalculator.Presets, item => item.Name == "CRC-32/ISO-HDLC");
+        using var stream = new MemoryStream("skip123456789"u8.ToArray());
+        stream.Position = 4;
+        Assert.Equal(0xCBF43926UL, await CrcCalculator.ComputeAsync(stream, preset.Parameters));
+        Assert.True(stream.CanRead);
+        Assert.Equal(stream.Length, stream.Position);
+    }
+
+    [Fact]
+    public async Task EmptyStreamAppliesInitialReflectionAndFinalXor()
+    {
+        using var stream = new ChunkedReadStream([], 1);
+        Assert.Equal(0xEDUL, await CrcCalculator.ComputeAsync(stream, new(8, 7, 0x12, true, true, 0xA5)));
+        Assert.False(stream.IsDisposed);
+    }
+
+    [Fact]
+    public async Task StreamingHonorsCancellationBeforeReading()
+    {
+        using var cancellation = new CancellationTokenSource();
+        cancellation.Cancel();
+        using var stream = new ChunkedReadStream([1, 2, 3], 1);
+        var error = await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await CrcCalculator.ComputeAsync(stream, new(8, 7, 0, false, false, 0), cancellation.Token));
+        Assert.Equal(cancellation.Token, error.CancellationToken);
+        Assert.Equal(0, stream.ReadCalls);
+        Assert.False(stream.IsDisposed);
+    }
+
+    [Fact]
+    public async Task StreamingHonorsCancellationAfterAReadEvenIfTheStreamDoesNotThrow()
+    {
+        using var cancellation = new CancellationTokenSource();
+        using var stream = new ChunkedReadStream([1, 2, 3], 1, afterRead: cancellation.Cancel);
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
+            await CrcCalculator.ComputeAsync(stream, new(8, 7, 0, false, false, 0), cancellation.Token));
+        Assert.Equal(1, stream.ReadCalls);
+        Assert.False(stream.IsDisposed);
+    }
+
+    [Fact]
+    public async Task StreamingPropagatesReadFailuresWithoutClosingTheStream()
+    {
+        var failure = new IOException("Read failed.");
+        using var stream = new ChunkedReadStream([1, 2, 3], 1, failure: failure);
+        var error = await Assert.ThrowsAsync<IOException>(async () =>
+            await CrcCalculator.ComputeAsync(stream, new(8, 7, 0, false, false, 0)));
+        Assert.Same(failure, error);
+        Assert.False(stream.IsDisposed);
     }
 
     [Fact]
@@ -124,8 +211,15 @@ public class CrcCalculatorTests
     [InlineData(8, 0x107UL, 0UL, 0UL)]
     [InlineData(8, 7UL, 0x100UL, 0UL)]
     [InlineData(8, 7UL, 0UL, 0x100UL)]
-    public void ComputeRejectsInvalidParameters(int width, ulong polynomial, ulong initial, ulong xorOut) =>
-        Assert.Throws<ArgumentException>(() => CrcCalculator.Compute([], new(width, polynomial, initial, false, false, xorOut)));
+    public async Task ComputeMethodsRejectInvalidParametersBeforeReading(int width, ulong polynomial, ulong initial, ulong xorOut)
+    {
+        var parameters = new CrcParameters(width, polynomial, initial, false, false, xorOut);
+        Assert.Throws<ArgumentException>(() => CrcCalculator.Compute([], parameters));
+        using var stream = new ChunkedReadStream([1], 1);
+        await Assert.ThrowsAsync<ArgumentException>(async () => await CrcCalculator.ComputeAsync(stream, parameters));
+        Assert.Equal(0, stream.ReadCalls);
+        Assert.False(stream.IsDisposed);
+    }
 
     [Theory]
     [InlineData(0)]
@@ -145,5 +239,55 @@ public class CrcCalculatorTests
     {
         Assert.Throws<ArgumentNullException>(() => CrcCalculator.Compute([], null!));
         Assert.Throws<ArgumentNullException>(() => CrcCalculator.ParseHex(null!, 8));
+    }
+
+    [Fact]
+    public async Task StreamingRejectsNullArguments()
+    {
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await CrcCalculator.ComputeAsync(null!, new(8, 7, 0, false, false, 0)));
+        using var stream = new ChunkedReadStream([1], 1);
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await CrcCalculator.ComputeAsync(stream, null!));
+        Assert.Equal(0, stream.ReadCalls);
+    }
+
+    private sealed class ChunkedReadStream(byte[] data, int maximumChunkSize, Action? afterRead = null, Exception? failure = null) : Stream
+    {
+        private int _position;
+        internal int ReadCalls { get; private set; }
+        internal int LargestReadRequest { get; private set; }
+        internal bool IsDisposed { get; private set; }
+        public override bool CanRead => !IsDisposed;
+        public override bool CanSeek => false;
+        public override bool CanWrite => false;
+        public override long Length => throw new NotSupportedException();
+        public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ReadCalls++;
+            LargestReadRequest = Math.Max(LargestReadRequest, buffer.Length);
+            await Task.Yield();
+            if (failure is not null)
+                throw failure;
+            int count = Math.Min(Math.Min(maximumChunkSize, buffer.Length), data.Length - _position);
+            data.AsMemory(_position, count).CopyTo(buffer);
+            _position += count;
+            afterRead?.Invoke();
+            return count;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            IsDisposed = true;
+            base.Dispose(disposing);
+        }
+
+        public override int Read(byte[] buffer, int offset, int count) => throw new NotSupportedException();
+        public override void Flush() => throw new NotSupportedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
+        public override void SetLength(long value) => throw new NotSupportedException();
+        public override void Write(byte[] buffer, int offset, int count) => throw new NotSupportedException();
     }
 }

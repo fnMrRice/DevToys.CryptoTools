@@ -55,6 +55,33 @@ internal static class CrcCalculator
 
     internal static ulong Compute(ReadOnlySpan<byte> data, CrcParameters parameters)
     {
+        ulong mask = Validate(parameters);
+        ulong crc = Update(data, parameters.Initial, parameters, mask);
+        return FinalizeCrc(crc, parameters, mask);
+    }
+
+    internal static async ValueTask<ulong> ComputeAsync(
+        Stream data,
+        CrcParameters parameters,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(data);
+        ulong mask = Validate(parameters);
+        cancellationToken.ThrowIfCancellationRequested();
+        byte[] buffer = new byte[64 * 1024];
+        ulong crc = parameters.Initial;
+        while (true)
+        {
+            int count = await data.ReadAsync(buffer.AsMemory(), cancellationToken).ConfigureAwait(false);
+            cancellationToken.ThrowIfCancellationRequested();
+            if (count == 0)
+                return FinalizeCrc(crc, parameters, mask);
+            crc = Update(buffer.AsSpan(0, count), crc, parameters, mask);
+        }
+    }
+
+    private static ulong Validate(CrcParameters parameters)
+    {
         ArgumentNullException.ThrowIfNull(parameters);
         ulong mask = Mask(parameters.Width);
         if (parameters.Polynomial == 0 ||
@@ -62,8 +89,11 @@ internal static class CrcCalculator
             (parameters.Initial & mask) != parameters.Initial ||
             (parameters.XorOut & mask) != parameters.XorOut)
             throw new ArgumentException(L("InvalidCrcParameters"), nameof(parameters));
+        return mask;
+    }
 
-        ulong crc = parameters.Initial;
+    private static ulong Update(ReadOnlySpan<byte> data, ulong crc, CrcParameters parameters, ulong mask)
+    {
         ulong highBit = 1UL << (parameters.Width - 1);
         foreach (byte value in data)
         {
@@ -78,7 +108,11 @@ internal static class CrcCalculator
                     crc ^= parameters.Polynomial;
             }
         }
+        return crc;
+    }
 
+    private static ulong FinalizeCrc(ulong crc, CrcParameters parameters, ulong mask)
+    {
         if (parameters.ReflectOutput)
             crc = Reflect(crc, parameters.Width);
         return (crc ^ parameters.XorOut) & mask;
