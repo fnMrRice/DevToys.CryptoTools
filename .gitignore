@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+.local/
+artifacts/
+.vs/
+.idea/
+*.user
+*.pfx
+*.p12
+*.key

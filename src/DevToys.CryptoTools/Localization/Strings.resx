@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <data name="Status" xml:space="preserve"><value>Status</value></data>
+  <data name="Completed" xml:space="preserve"><value>Operation completed.</value></data>
+  <data name="Cryptography" xml:space="preserve"><value>Cryptography</value></data>
+  <data name="KeyTitle" xml:space="preserve"><value>Key generator</value></data>
+  <data name="KeyDescription" xml:space="preserve"><value>Generate RSA, elliptic curve and symmetric keys.</value></data>
+  <data name="CertTitle" xml:space="preserve"><value>Certificate generator</value></data>
+  <data name="CertDescription" xml:space="preserve"><value>Generate self-signed X.509 certificates and PKCS#10 requests.</value></data>
+  <data name="RsaTitle" xml:space="preserve"><value>RSA</value></data>
+  <data name="RsaDescription" xml:space="preserve"><value>RSA encryption, decryption, signing and verification.</value></data>
+  <data name="EcTitle" xml:space="preserve"><value>Elliptic curve cryptography</value></data>
+  <data name="EcDescription" xml:space="preserve"><value>ECDSA, EdDSA and ECDH/XDH hybrid encryption.</value></data>
+  <data name="SymTitle" xml:space="preserve"><value>Symmetric encryption</value></data>
+  <data name="SymDescription" xml:space="preserve"><value>AES-GCM, AES-CBC and ChaCha20-Poly1305 encryption.</value></data>
+  <data name="Algorithm" xml:space="preserve"><value>Algorithm</value></data>
+  <data name="Generate" xml:space="preserve"><value>Generate</value></data>
+  <data name="PublicKey" xml:space="preserve"><value>Public key (SPKI PEM)</value></data>
+  <data name="PrivateKey" xml:space="preserve"><value>Private key (PKCS#8 PEM)</value></data>
+  <data name="SymKey" xml:space="preserve"><value>Symmetric key (Base64)</value></data>
+  <data name="KeyNote" xml:space="preserve"><value>Keys are generated locally. Keep private and symmetric keys secret.</value></data>
+  <data name="Subject" xml:space="preserve"><value>Subject (X.500 distinguished name)</value></data>
+  <data name="DnsNames" xml:space="preserve"><value>DNS names (comma separated)</value></data>
+  <data name="Validity" xml:space="preserve"><value>Validity (days, 1–3650)</value></data>
+  <data name="Certificate" xml:space="preserve"><value>Certificate (PEM)</value></data>
+  <data name="Csr" xml:space="preserve"><value>Certificate request (PKCS#10 PEM)</value></data>
+  <data name="GenerateCert" xml:space="preserve"><value>Generate self-signed certificate</value></data>
+  <data name="GenerateCsr" xml:space="preserve"><value>Generate certificate request</value></data>
+  <data name="CertNote" xml:space="preserve"><value>Creates a new key for each operation. Self-signed certificates are for local development; CSR output requires a CA signature.</value></data>
+  <data name="KeyPem" xml:space="preserve"><value>Key (PEM; public key to encrypt/verify, private key to decrypt/sign)</value></data>
+  <data name="Input" xml:space="preserve"><value>Input</value></data>
+  <data name="Output" xml:space="preserve"><value>Output</value></data>
+  <data name="Encrypt" xml:space="preserve"><value>Encrypt</value></data>
+  <data name="Decrypt" xml:space="preserve"><value>Decrypt</value></data>
+  <data name="Sign" xml:space="preserve"><value>Sign</value></data>
+  <data name="Verify" xml:space="preserve"><value>Verify</value></data>
+  <data name="Signature" xml:space="preserve"><value>Signature (Base64)</value></data>
+  <data name="Valid" xml:space="preserve"><value>Signature is valid.</value></data>
+  <data name="Invalid" xml:space="preserve"><value>Signature is invalid.</value></data>
+  <data name="Padding" xml:space="preserve"><value>Encryption padding</value></data>
+  <data name="SignaturePadding" xml:space="preserve"><value>Signature padding</value></data>
+  <data name="Hash" xml:space="preserve"><value>Hash</value></data>
+  <data name="RsaNote" xml:space="preserve"><value>Encrypt/sign UTF-8 text; decrypt Base64 ciphertext. RSA accepts short messages only. Signatures are Base64.</value></data>
+  <data name="EcNote" xml:space="preserve"><value>ECDSA uses DER signatures. Ed25519/Ed448 use pure EdDSA. Encryption uses ephemeral ECDH/X25519/X448 + HKDF-SHA256 + AES-256-GCM in a CryptoTools JSON envelope.</value></data>
+  <data name="SigningAlgorithm" xml:space="preserve"><value>Signing algorithm</value></data>
+  <data name="EncryptionAlgorithm" xml:space="preserve"><value>Encryption algorithm</value></data>
+  <data name="EcKeyNote" xml:space="preserve"><value>Use a matching key type from the Key generator for the selected operation.</value></data>
+  <data name="SymNote" xml:space="preserve"><value>Encrypt UTF-8 text to a versioned JSON envelope; paste it as input to decrypt. A new random nonce/IV is generated for every encryption. AES-CBC provides no authentication.</value></data>
+  <data name="InvalidAlgorithm" xml:space="preserve"><value>Unsupported algorithm.</value></data>
+  <data name="InvalidKeySize" xml:space="preserve"><value>Invalid key size.</value></data>
+  <data name="InvalidValidity" xml:space="preserve"><value>Validity must be an integer from 1 to 3650 days.</value></data>
+  <data name="InvalidEnvelope" xml:space="preserve"><value>Invalid or unsupported ciphertext envelope.</value></data>
+  <data name="InvalidKey" xml:space="preserve"><value>The key type does not match the selected algorithm.</value></data>
+  <data name="MessageTooLong" xml:space="preserve"><value>Message exceeds the RSA padding limit. Use hybrid encryption for larger messages.</value></data>
+  <data name="Clear" xml:space="preserve"><value>Clear</value></data>
+  <data name="InvalidUtf8" xml:space="preserve"><value>Decrypted data is not valid UTF-8.</value></data>
+</root>
