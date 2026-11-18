@@ -19,7 +19,7 @@ jobs:
       - run: dotnet test -c Release --no-restore
       - run: dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
       - shell: pwsh
-        run: ./scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.1.nupkg
+        run: ./scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.2.nupkg
       - uses: actions/upload-artifact@v4
         with:
           name: DevToys.CryptoTools-${{ matrix.os }}
