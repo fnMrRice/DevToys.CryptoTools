@@ -58,4 +58,9 @@
   <data name="InvalidUtf8" xml:space="preserve"><value>解密数据不是有效的 UTF-8 文本。</value></data>
   <data name="Sm2Id" xml:space="preserve"><value>SM2 用户 ID（UTF-8，仅用于签名与验签）</value></data>
   <data name="Sm2Note" xml:space="preserve"><value>SM2 使用 sm2p256v1 曲线和 SM3。加密输出为原始 C1C3C2 或 C1C2C3 的 Base64（C1 为非压缩点），不是 JSON 密文。签名与验签必须使用相同的用户 ID。</value></data>
+  <data name="InvalidEncoding" xml:space="preserve"><value>不支持的编码。</value></data>
+  <data name="InvalidTextEncoding" xml:space="preserve"><value>这些字节不是有效的 UTF-8 文本，请选择 Base64 或 Hex。</value></data>
+  <data name="InvalidIvSize" xml:space="preserve"><value>IV / nonce 必须包含 {0} 个字节。</value></data>
+  <data name="InvalidPadding" xml:space="preserve"><value>当前模式不支持所选填充。</value></data>
+  <data name="InvalidCiphertext" xml:space="preserve"><value>密文必须包含 16 字节的认证标签。</value></data>
 </root>

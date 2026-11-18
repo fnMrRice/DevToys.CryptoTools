@@ -58,4 +58,9 @@
   <data name="InvalidUtf8" xml:space="preserve"><value>Decrypted data is not valid UTF-8.</value></data>
   <data name="Sm2Id" xml:space="preserve"><value>SM2 user ID (UTF-8, signing and verification only)</value></data>
   <data name="Sm2Note" xml:space="preserve"><value>SM2 uses sm2p256v1 and SM3. Encryption output is Base64 raw C1C3C2 or C1C2C3 (uncompressed C1), not a JSON envelope. Signing and verification must use the same user ID.</value></data>
+  <data name="InvalidEncoding" xml:space="preserve"><value>Unsupported encoding.</value></data>
+  <data name="InvalidTextEncoding" xml:space="preserve"><value>These bytes are not valid UTF-8 text. Select Base64 or Hex.</value></data>
+  <data name="InvalidIvSize" xml:space="preserve"><value>IV / nonce must contain {0} bytes.</value></data>
+  <data name="InvalidPadding" xml:space="preserve"><value>Padding is not supported for the selected mode.</value></data>
+  <data name="InvalidCiphertext" xml:space="preserve"><value>Ciphertext must include a 16-byte authentication tag.</value></data>
 </root>
