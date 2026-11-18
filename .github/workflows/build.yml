@@ -1,0 +1,26 @@
+name: Build and package
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet restore
+      - run: dotnet test -c Release --no-restore
+      - run: dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
+      - shell: pwsh
+        run: ./scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.1.0.nupkg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DevToys.CryptoTools-${{ matrix.os }}
+          path: artifacts/*.nupkg

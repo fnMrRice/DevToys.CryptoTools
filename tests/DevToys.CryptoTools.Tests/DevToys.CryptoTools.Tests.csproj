@@ -10,6 +10,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" PrivateAssets="all" />
     <ProjectReference Include="../../src/DevToys.CryptoTools/DevToys.CryptoTools.csproj" />
     <PackageReference Include="DevToys.Api" Version="2.0.10-preview" ExcludeAssets="build" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
     <Using Include="Xunit" />
   </ItemGroup>
 </Project>

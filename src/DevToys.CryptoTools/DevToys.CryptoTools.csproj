@@ -14,11 +14,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" />
+    <PackageReference Include="BouncyCastle.Cryptography" Version="2.7.0" PrivateAssets="all" GeneratePathProperty="true" />
     <PackageReference Include="DevToys.Api" Version="2.0.10-preview" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="../../README.md" Pack="true" PackagePath="/" />
+    <None Include="$(PkgBouncyCastle_Cryptography)/lib/net6.0/BouncyCastle.Cryptography.dll" Pack="true" PackagePath="lib/net8.0/" />
+    <None Include="$(PkgBouncyCastle_Cryptography)/LICENSE.md" Pack="true" PackagePath="licenses/BouncyCastle.LICENSE.md" />
+    <None Include="$(OutputPath)$(AssemblyName).deps.json" Pack="true" PackagePath="lib/net8.0/" />
   </ItemGroup>
 </Project>

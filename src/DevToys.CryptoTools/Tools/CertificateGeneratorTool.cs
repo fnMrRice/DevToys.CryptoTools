@@ -9,7 +9,7 @@ namespace DevToys.CryptoTools.Tools;
 [Export(typeof(IGuiTool))]
 [Name("DevToys.CryptoTools.CertificateGeneratorTool")]
 [ToolDisplayInformation(
-    IconFontName = "FluentSystemIcons", IconGlyph = '\uE670',
+    IconFontName = "FluentSystemIcons", IconGlyph = '\uE8C9',
     GroupName = PredefinedCommonToolGroupNames.Generators,
     ResourceManagerAssemblyIdentifier = nameof(CryptoToolsResourceAssemblyIdentifier),
     ResourceManagerBaseName = ResourceBaseName,

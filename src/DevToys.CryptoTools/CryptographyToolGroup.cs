@@ -12,7 +12,7 @@ internal sealed class CryptographyToolGroup : GuiToolGroup
     public CryptographyToolGroup()
     {
         IconFontName = "FluentSystemIcons";
-        IconGlyph = '\uE670';
+        IconGlyph = '\uE8C9';
         DisplayTitle = L("Cryptography");
         AccessibleName = DisplayTitle;
     }

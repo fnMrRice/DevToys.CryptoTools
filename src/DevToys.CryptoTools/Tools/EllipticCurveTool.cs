@@ -9,7 +9,7 @@ namespace DevToys.CryptoTools.Tools;
 [Export(typeof(IGuiTool))]
 [Name("DevToys.CryptoTools.EllipticCurveTool")]
 [ToolDisplayInformation(
-    IconFontName = "FluentSystemIcons", IconGlyph = '\uE670',
+    IconFontName = "FluentSystemIcons", IconGlyph = '\uE8C9',
     GroupName = CryptographyToolGroup.GroupName,
     ResourceManagerAssemblyIdentifier = nameof(CryptoToolsResourceAssemblyIdentifier),
     ResourceManagerBaseName = ResourceBaseName,
