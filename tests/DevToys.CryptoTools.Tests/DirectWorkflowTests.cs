@@ -17,7 +17,13 @@ public class DirectWorkflowTests
     {
         var tool = new KeyGeneratorTool();
         var algorithms = Find<IUISelectDropDownList>(tool, "key-algorithm");
-        algorithms.Select(algorithms.Items!.Single(i => Equals(i.Value, algorithm)));
+        string family = algorithm.StartsWith("ECDSA-", StringComparison.Ordinal) ? "ECDSA" : algorithm;
+        algorithms.Select(algorithms.Items!.Single(i => Equals(i.Value, family)));
+        if (family == "ECDSA")
+        {
+            var curve = Find<IUISelectDropDownList>(tool, "key-curve");
+            curve.Select(curve.Items!.Single(i => Equals(i.Value, algorithm[6..])));
+        }
         await Click(tool, "key-generate");
         string privateKey = Find<IUIMultiLineTextInput>(tool, "key-private").Text;
         await Click(tool, "key-send-csr");
