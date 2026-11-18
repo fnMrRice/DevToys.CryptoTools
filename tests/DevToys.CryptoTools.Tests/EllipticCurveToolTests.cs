@@ -16,6 +16,9 @@ public class EllipticCurveToolTests
         var tool = new EllipticCurveTool();
         Assert.Equal(4, Find<IUISelectDropDownList>(tool, "ec-operation").Items!.Length);
         Assert.True(Find<IUISelectDropDownList>(tool, "ec-public-source").IsVisible);
+        var source = Find<IUISelectDropDownList>(tool, "ec-public-source");
+        Assert.Contains(source, Find<IUIStack>(tool, "ec-options").Children!);
+        Assert.DoesNotContain(source, Find<IUIStack>(tool, "ec-public-panel").Children!);
         Assert.False(Find<IUISingleLineTextInput>(tool, "ec-sm2-id").IsVisible);
         Select(tool, "ec-operation", "Sign");
         Select(tool, "ec-algorithm", "SM2");

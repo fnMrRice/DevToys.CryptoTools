@@ -64,10 +64,10 @@ internal sealed class EllipticCurveTool : CryptoToolBase
         _privateKey.Editor.Title(L("PrivateKey"));
         _coordinates = Stack("ec-coordinates").Vertical().SmallSpacing().WithChildren(_coordinateEncoding, _x, _y,
             Label().Text(L("CoordinateEncodingHint")).AlignHorizontally(UIHorizontalAlignment.Left));
-        _publicPanel = Stack("ec-public-panel").Vertical().SmallSpacing().WithChildren(_source,
+        _publicPanel = Stack("ec-public-panel").Vertical().SmallSpacing().WithChildren(
             Grid().Cells(At(0, 0, _publicKey.View), At(0, 0, _coordinates)));
         var keyPanel = Grid("ec-key-panel").Cells(At(0, 0, _publicPanel), At(0, 0, _privateKey.View));
-        var options = Stack().Vertical().MediumSpacing().WithChildren(_operation, _algorithm, _sm2Id);
+        var options = Stack("ec-options").Vertical().MediumSpacing().WithChildren(_operation, _algorithm, _source, _sm2Id);
         var configuration = Grid("ec-configuration").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().Cells(
             At(0, 0, options.AlignVertically(UIVerticalAlignment.Top)), At(0, 1, keyPanel));
         _inputPane = Grid("ec-input-pane").Rows(Fraction(1), Auto).RowMediumSpacing().Cells(At(0, 0, _input), At(1, 0, _signature));
