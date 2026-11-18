@@ -40,7 +40,7 @@ internal abstract class CryptoToolBase : IGuiTool
             action();
             _status.Description(L("Completed")).Success().Show();
         }
-        catch (Exception ex) when (ex is CryptographicException or ArgumentException or FormatException or InvalidOperationException or NotSupportedException or System.Text.Json.JsonException)
+        catch (Exception ex) when (ex is CryptographicException or ArgumentException or FormatException or InvalidOperationException or NotSupportedException or System.Text.Json.JsonException or Org.BouncyCastle.Crypto.CryptoException or System.IO.IOException)
         {
             _status.Description(ex.Message).Error().Show();
         }
