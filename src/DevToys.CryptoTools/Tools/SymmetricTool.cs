@@ -20,7 +20,7 @@ namespace DevToys.CryptoTools.Tools;
     AccessibleNameResourceName = "SymTitle")]
 internal sealed class SymmetricTool : CryptoToolBase
 {
-    private readonly IUISelectDropDownList _algorithm = Options("sym-algorithm", "AES", "SM4", "ChaCha20");
+    private readonly IUISelectDropDownList _algorithm = Options("sym-algorithm", SymmetricAlgorithmCatalog.Algorithms);
     private readonly IUISelectDropDownList _mode = Options("sym-mode", "GCM", "CBC");
     private readonly IUISelectDropDownList _padding = Options("sym-padding", "None");
     private readonly IUISelectDropDownList _keyEncoding = EncodingChoice("sym-key-encoding", BinaryEncoding.Hex);
@@ -31,7 +31,7 @@ internal sealed class SymmetricTool : CryptoToolBase
     private readonly IUISingleLineTextInput _iv = SingleLineTextInput("sym-iv").ShowCommandBar().CanCopyWhenEditable();
     private readonly IUIMultiLineTextInput _input = MultiLineTextInput("sym-input").Title(L("Input")).ShowCommandBar().Extendable();
     private readonly IUIMultiLineTextInput _output = MultiLineTextInput("sym-output").Title(L("Output")).ReadOnly().ShowCommandBar().Extendable();
-    private readonly IUILabel _modeHint = Label("sym-mode-hint").AlignHorizontally(UIHorizontalAlignment.Left);
+    private readonly IUIButton _generateIv;
     private readonly IUIGrid _layout;
     private byte[]? _lastOutput;
     private byte[]? _generatedIv;
@@ -67,15 +67,14 @@ internal sealed class SymmetricTool : CryptoToolBase
         _output.CommandBarExtraContent(Stack().Horizontal().SmallSpacing().WithChildren(
             _outputEncoding, CreateActionButton(L("Clear"), ClearOutput, "sym-clear-output")));
 
-        var settings = Grid("sym-settings").Columns(Auto, Auto, Fraction(1)).Rows(Auto, Auto, Auto).RowMediumSpacing().ColumnMediumSpacing().Cells(
+        var settings = Grid("sym-settings").Columns(Auto, Fraction(1)).Rows(Auto, Auto, Auto).RowMediumSpacing().ColumnMediumSpacing().Cells(
             At(0, 0, Label().Text(L("Algorithm")).AlignHorizontally(UIHorizontalAlignment.Left)), At(0, 1, _algorithm),
             At(1, 0, Label().Text(L("Mode")).AlignHorizontally(UIHorizontalAlignment.Left)), At(1, 1, _mode),
             At(2, 0, Label().Text(L("BlockPadding")).AlignHorizontally(UIHorizontalAlignment.Left)), At(2, 1, _padding));
-        var options = Stack().Vertical().MediumSpacing().WithChildren(settings, _modeHint).AlignVertically(UIVerticalAlignment.Top);
-        var keyPanel = Stack().Vertical().SmallSpacing().WithChildren(_key, _iv,
-            Stack().Horizontal().MediumSpacing().WithChildren(
-                CreateActionButton(L("GenerateIv"), GenerateIv, "sym-generate-iv"),
-                Label().Text(L("IvHint")).AlignHorizontally(UIHorizontalAlignment.Left)))
+        var options = settings.AlignVertically(UIVerticalAlignment.Top);
+        _generateIv = CreateActionButton(L("GenerateIv"), GenerateIv, "sym-generate-iv").AlignHorizontally(UIHorizontalAlignment.Left);
+        var keyPanel = Stack().Vertical().SmallSpacing().WithChildren(_key, PlaceholderTextInput.Wrap(_iv, L("IvHint"), "sym-iv-placeholder"),
+            _generateIv)
             .AlignVertically(UIVerticalAlignment.Top);
         var configuration = Grid("sym-configuration").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().Cells(At(0, 0, options), At(0, 1, keyPanel));
         var actions = Stack("sym-actions").Horizontal().SmallSpacing().AlignHorizontally(UIHorizontalAlignment.Left).WithChildren(
@@ -86,14 +85,14 @@ internal sealed class SymmetricTool : CryptoToolBase
         var editors = SplitGrid("sym-editors").Vertical().WithLeftPaneChild(_input).WithRightPaneChild(_output);
         _layout = Grid("sym-layout").Rows(Auto, Auto, Fraction(1), Auto).RowMediumSpacing().Cells(
             At(0, 0, configuration), At(1, 0, actions), At(2, 0, editors), At(3, 0, Status));
-        UpdatePadding();
+        UpdateModes();
     }
 
-    private string CipherAlgorithm => Selected(_algorithm) == "ChaCha20" ? "ChaCha20-Poly1305" : Selected(_algorithm) + "-" + Selected(_mode);
+    private string CipherAlgorithm => Selected(_algorithm) + "-" + Selected(_mode);
     private static IUIGridCell At(int row, int column, IUIElement element) => Cell().Row(row).Column(column).WithChild(element);
     private static BinaryEncoding EncodingOf(IUISelectDropDownList choice) => (BinaryEncoding)choice.SelectedItem!.Value!;
     private static IUISelectDropDownList Options(string id, params string[] values) => SelectDropDownList(id)
-        .WithItems(values.Select(value => Item(value, value)).ToArray()).Select(0).AlignHorizontally(UIHorizontalAlignment.Left);
+        .WithItems(values.Select(value => Item(value, value)).ToArray()).Select(0).AlignHorizontally(UIHorizontalAlignment.Stretch);
     private static IUISelectDropDownList EncodingChoice(string id, BinaryEncoding selected) => SelectDropDownList(id)
         .WithItems(Item("Base64", BinaryEncoding.Base64), Item("Hex", BinaryEncoding.Hex), Item(L("Utf8Text"), BinaryEncoding.Text))
         .Select((int)selected).AlignHorizontally(UIHorizontalAlignment.Left);
@@ -101,7 +100,7 @@ internal sealed class SymmetricTool : CryptoToolBase
     private void UpdateModes()
     {
         string previous = Selected(_mode);
-        string[] modes = Selected(_algorithm) == "ChaCha20" ? ["Poly1305"] : ["GCM", "CBC"];
+        string[] modes = SymmetricAlgorithmCatalog.Modes(Selected(_algorithm));
         _mode.WithItems(modes.Select(value => Item(value, value)).ToArray()).Select(Math.Max(0, Array.IndexOf(modes, previous)));
         if (modes.Length == 1) _mode.Disable(); else _mode.Enable();
         UpdatePadding();
@@ -109,12 +108,13 @@ internal sealed class SymmetricTool : CryptoToolBase
 
     private void UpdatePadding()
     {
-        bool cbc = Selected(_mode) == "CBC";
-        _padding.WithItems(cbc ? [Item("PKCS7", "PKCS7"), Item(L("NoPadding"), "None")] : [Item(L("NoPadding"), "None")]).Select(0);
-        if (cbc) _padding.Enable(); else _padding.Disable();
+        string[] paddings = SymmetricAlgorithmCatalog.PaddingNames(CipherAlgorithm);
+        _padding.WithItems(paddings.Select(value => Item(value == "None" ? L("NoPadding") : value, value)).ToArray()).Select(0);
+        if (paddings.Length > 1) _padding.Enable(); else _padding.Disable();
         int length = SymmetricCipher.IvLength(CipherAlgorithm);
-        _iv.Title(string.Format(System.Globalization.CultureInfo.CurrentCulture, L("IvTitle"), length));
-        _modeHint.Text(L(cbc ? "CbcHint" : "AuthenticatedHint"));
+        _iv.Title(length == 0 ? L("IvNotRequired") : string.Format(System.Globalization.CultureInfo.CurrentCulture, L("IvTitle"), length));
+        if (length == 0) { _iv.Disable(); _ivEncoding.Disable(); _generateIv.Disable(); }
+        else { _iv.Enable(); _ivEncoding.Enable(); _generateIv.Enable(); }
         if (_automaticIv) { _iv.Text(""); _generatedIv = null; }
         ClearOutput();
     }
@@ -125,17 +125,18 @@ internal sealed class SymmetricTool : CryptoToolBase
         byte[] key = BinaryText.Decode(_key.Text ?? "", EncodingOf(_keyEncoding));
         try
         {
-            if (!encrypt && (_input.Text ?? "").TrimStart().StartsWith('{'))
+            if (!encrypt && IsLegacyEnvelope(_input.Text ?? ""))
             {
                 // Keep ciphertext generated by v0.1.0 readable.
                 string plaintext = SymmetricCryptography.Decrypt(CipherAlgorithm, Convert.ToBase64String(key), _input.Text!);
                 SetOutput(BinaryText.Decode(plaintext, BinaryEncoding.Text));
                 return;
             }
-            if (encrypt && _automaticIv) GenerateIv();
-            byte[] iv = BinaryText.Decode(_iv.Text ?? "", EncodingOf(_ivEncoding));
+            int ivLength = SymmetricCipher.IvLength(CipherAlgorithm);
+            if (encrypt && _automaticIv && ivLength > 0) GenerateIv();
+            byte[] iv = ivLength == 0 ? [] : BinaryText.Decode(_iv.Text ?? "", EncodingOf(_ivEncoding));
             byte[] input = BinaryText.Decode(_input.Text ?? "", EncodingOf(_inputEncoding));
-            var padding = Selected(_padding) == "PKCS7" ? PaddingMode.PKCS7 : PaddingMode.None;
+            var padding = Enum.Parse<PaddingMode>(Selected(_padding));
             SetOutput(SymmetricCipher.Transform(encrypt, CipherAlgorithm, key, iv, input, padding));
         }
         finally { CryptographicOperations.ZeroMemory(key); }
@@ -151,6 +152,19 @@ internal sealed class SymmetricTool : CryptoToolBase
         _automaticIv = true;
         _generatedIv = iv;
         WriteIv(iv);
+    }
+
+    private static bool IsLegacyEnvelope(string text)
+    {
+        if (!text.TrimStart().StartsWith('{')) return false;
+        try
+        {
+            var envelope = System.Text.Json.JsonSerializer.Deserialize<SymmetricEnvelope>(text,
+                new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
+            return envelope is not null && envelope.Version > 0 && SymmetricCryptography.Algorithms.Contains(envelope.Algorithm)
+                && envelope.Nonce is not null && envelope.Tag is not null && envelope.Ciphertext is not null;
+        }
+        catch (System.Text.Json.JsonException) { return false; }
     }
 
     private void WriteIv(byte[] iv)

@@ -25,7 +25,9 @@ public class SymmetricToolTests
             Assert.False(input.HideCommandBar);
             Assert.False(input.IsReadOnly);
         }
-        Assert.Equal(UIHorizontalAlignment.Left, Find<IUISelectDropDownList>(tool, "sym-algorithm").HorizontalAlignment);
+        foreach (string id in new[] { "sym-algorithm", "sym-mode", "sym-padding" })
+            Assert.Equal(UIHorizontalAlignment.Stretch, Find<IUISelectDropDownList>(tool, id).HorizontalAlignment);
+        Assert.Equal(2, Find<IUIGrid>(tool, "sym-settings").Columns!.Length);
     }
 
     [Theory]
@@ -77,7 +79,7 @@ public class SymmetricToolTests
         Assert.False(padding.IsEnabled);
         Assert.Equal("None", padding.SelectedItem!.Value);
         Assert.Equal("Poly1305", Find<IUISelectDropDownList>(tool, "sym-mode").SelectedItem!.Value);
-        Assert.False(Find<IUISelectDropDownList>(tool, "sym-mode").IsEnabled);
+        Assert.True(Find<IUISelectDropDownList>(tool, "sym-mode").IsEnabled);
         Select(tool, "sym-algorithm", "SM4");
         Assert.True(Find<IUISelectDropDownList>(tool, "sym-mode").IsEnabled);
     }
@@ -107,6 +109,75 @@ public class SymmetricToolTests
         Find<IUISingleLineTextInput>(tool, "sym-iv").Text("00");
         await Click(tool, "sym-encrypt");
         Assert.Empty(Find<IUIMultiLineTextInput>(tool, "sym-output").Text);
+    }
+
+    [Theory]
+    [InlineData("Camellia", "CTR", 16, 16)]
+    [InlineData("ARIA", "CCM", 16, 12)]
+    [InlineData("Twofish", "EAX", 32, 16)]
+    [InlineData("Serpent", "CFB8", 16, 16)]
+    [InlineData("Blowfish", "CBC", 16, 8)]
+    [InlineData("DES", "ECB", 8, 0)]
+    [InlineData("Salsa20", "Raw", 32, 8)]
+    public async Task ExpandedAlgorithmAndModeChoicesReachTheCipher(string algorithm, string mode, int keyLength, int ivLength)
+    {
+        var tool = new SymmetricTool();
+        Select(tool, "sym-algorithm", algorithm);
+        Select(tool, "sym-mode", mode);
+        Find<IUISingleLineTextInput>(tool, "sym-key").Text(Convert.ToHexString(Enumerable.Repeat((byte)'k', keyLength).ToArray()));
+        if (ivLength > 0) Find<IUISingleLineTextInput>(tool, "sym-iv").Text(Convert.ToHexString(new byte[ivLength]));
+        else
+        {
+            Assert.False(Find<IUISingleLineTextInput>(tool, "sym-iv").IsEnabled);
+            Assert.False(Find<IUIButton>(tool, "sym-generate-iv").IsEnabled);
+        }
+        Find<IUIMultiLineTextInput>(tool, "sym-input").Text("expanded modes 🔑");
+        await Click(tool, "sym-encrypt");
+        Assert.NotEmpty(Find<IUIMultiLineTextInput>(tool, "sym-output").Text);
+        await Click(tool, "sym-use-output");
+        await Click(tool, "sym-decrypt");
+        Assert.Equal("expanded modes 🔑", Find<IUIMultiLineTextInput>(tool, "sym-output").Text);
+    }
+
+    [Fact]
+    public void AlgorithmsOnlyOfferCompatibleModesAndPaddings()
+    {
+        var tool = new SymmetricTool();
+        Select(tool, "sym-mode", "GCM");
+        Select(tool, "sym-algorithm", "DES");
+        var mode = Find<IUISelectDropDownList>(tool, "sym-mode");
+        Assert.DoesNotContain(mode.Items!, item => Equals(item.Value, "GCM") || Equals(item.Value, "CCM"));
+        Select(tool, "sym-mode", "CTR");
+        Assert.False(Find<IUISelectDropDownList>(tool, "sym-padding").IsEnabled);
+        Select(tool, "sym-mode", "CBC");
+        Assert.True(Find<IUISelectDropDownList>(tool, "sym-padding").Items!.Length >= 5);
+    }
+
+    [Fact]
+    public async Task RawTextCiphertextStartingWithBraceIsNotMisreadAsLegacyJson()
+    {
+        var tool = new SymmetricTool();
+        Select(tool, "sym-mode", "CBC");
+        Select(tool, "sym-padding", "None");
+        Select(tool, "sym-output-encoding", BinaryEncoding.Hex);
+        Find<IUISingleLineTextInput>(tool, "sym-key").Text(new string('0', 32));
+        Find<IUISingleLineTextInput>(tool, "sym-iv").Text(new string('0', 32));
+        Find<IUIMultiLineTextInput>(tool, "sym-input").Text("{0123456789ABCD}");
+        await Click(tool, "sym-decrypt");
+        Assert.Equal(32, Find<IUIMultiLineTextInput>(tool, "sym-output").Text.Length);
+    }
+
+    [Fact]
+    public async Task RecognizedLegacyEnvelopeStillDecryptsWithItsStoredIv()
+    {
+        var tool = new SymmetricTool();
+        byte[] key = new byte[16];
+        Find<IUISingleLineTextInput>(tool, "sym-key").Text(Convert.ToHexString(key));
+        string legacy = SymmetricCryptography.Encrypt("AES-GCM", Convert.ToBase64String(key), "legacy message");
+        Find<IUIMultiLineTextInput>(tool, "sym-input").Text(legacy);
+        Select(tool, "sym-output-encoding", BinaryEncoding.Text);
+        await Click(tool, "sym-decrypt");
+        Assert.Equal("legacy message", Find<IUIMultiLineTextInput>(tool, "sym-output").Text);
     }
 
     private static T Find<T>(SymmetricTool tool, string id) where T : IUIElement => Assert.IsAssignableFrom<T>(tool.View.GetChildElementById(id));
