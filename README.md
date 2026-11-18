@@ -10,14 +10,15 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 | Generators | Key generator | Asymmetric pairs only: RSA 2048/3072/4096; ECDSA/ECDH NIST P-256/P-384/P-521, secp256k1, Brainpool P256r1/P384r1/P512r1; Ed25519/Ed448; X25519/X448; SM2 |
 | Generators | Certificate request generator | PKCS#10 CSR from generated or imported key pairs; subject, SAN and requested extensions |
 | Generators | Certificate generator | Self-signed or CA-issued X.509, including issuance from a verified CSR; RSA/RSA-PSS, ECDSA, Ed25519/Ed448 and SM2/SM3 |
+| Generators | Cyclic redundancy check (CRC) / 循环冗余校验 | Standard presets and custom polynomials, widths 1–64 bits, Init/RefIn/RefOut/XorOut |
 | Cryptography / 加解密 | RSA algorithms / RSA 算法 | OAEP SHA-256/384/512, PKCS#1 v1.5 encryption; PSS and PKCS#1 v1.5 signatures with SHA-256/384/512; PEM/Base64/Hex public keys, certificates or modulus/exponent |
 | Cryptography / 加解密 | Elliptic curve algorithms / 椭圆曲线算法 | Encrypt/decrypt with ECDH, X25519/X448 and SM2; sign/verify with ECDSA, Ed25519/Ed448 and SM2; public keys from PEM/Base64/Hex, certificates or X/Y coordinates |
 | Cryptography / 加解密 | Symmetric key algorithms / 对称密钥算法 | AES, SM4, Camellia, ARIA, Twofish, Serpent, Blowfish, CAST5, DES, TripleDES, RC2, ChaCha20, XChaCha20, Salsa20 and XSalsa20; compatible block/stream/AEAD modes |
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.6.nupkg` from `artifacts/`.
-2. Restart DevToys. Key, certificate request and certificate tools appear under **Generators**; RSA, symmetric key algorithms and elliptic curve algorithms appear under **Cryptography** (加解密 in Chinese).
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.7.nupkg` from `artifacts/`.
+2. Restart DevToys. Key, certificate request, certificate and CRC tools appear under **Generators**; RSA, symmetric key algorithms and elliptic curve algorithms appear under **Cryptography** (加解密 in Chinese).
 3. Generate a key using the algorithm needed by your operation. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV; choose **Base64** when pasting a key from the key generator. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
 5. Certificates and CSRs are PEM text. Save the certificate/request and its matching PKCS#8 private key separately. A new key is created only when no subject private key is imported. The **Create certificate request** button on the key generator opens the CSR form with the existing pair; **Use CSR to issue certificate** opens certificate issuance with that request. These are the actual destination forms embedded in the current tool with a **Back** button; no clipboard or sidebar navigation is needed. Each form is also available separately in Generators.
@@ -85,6 +86,14 @@ ECB/CBC support PKCS7, None, Zeros, ANSIX923 and ISO10126 message padding. Other
 
 ECB uses no IV. CBC/CFB/OFB/CTR use an IV equal to the block size (8 or 16 bytes). CFB uses full-block feedback (CFB64/CFB128); CFB8 is separate. CTR interprets the full IV as a big-endian initial counter. GCM, CCM and ChaCha20 use 12-byte nonces; XChaCha20/XSalsa20 use 24 bytes, Salsa20 uses 8 bytes. EAX uses a block-sized nonce. GCM/CCM/Poly1305 tags are 16 bytes; EAX tags equal the block size. Raw stream modes start at counter zero. **Only GCM, CCM, EAX and Poly1305 authenticate ciphertext.**
 
+## Cyclic redundancy check (CRC)
+
+The Generators CRC page includes common standard presets and a custom mode. Selecting a preset fills its width, polynomial, initial value, input/output reflection and final XOR. All fields remain editable; changing a parameter switches the selector to **Custom** and clears the published preset check value. Input accepts UTF-8 text, Hex bytes or Base64 bytes.
+
+Polynomials, initial values and final XOR are unsigned Hex values, optionally prefixed with `0x`. The polynomial uses its normal representation without the implicit highest `x^width` term; for example, CRC-16/MODBUS uses `8005`, with reflection controlled by the switches. The width may be 1–64 bits, including sub-byte widths. Values outside the width and a zero polynomial are rejected.
+
+Output can be fixed-width numeric Hex, decimal, a binary string of exactly the selected width, or Base64 of big-endian CRC bytes (unused high bits are zero). The displayed preset check is the standard result for ASCII `123456789`, not the result of the current input. Preset parameters and check values are based on the [CRC RevEng catalogue](https://reveng.sourceforge.io/crc-catalogue/all.htm), and every included preset is tested against its published check value.
+
 ## Build and test
 
 Use a .NET SDK capable of targeting .NET 8. No native dependencies are required beyond the runtime's cryptography providers.
@@ -94,7 +103,7 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.6.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.7.nupkg
 ```
 
 Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
@@ -104,7 +113,7 @@ The package bundles Bouncy Castle and its license plus the Chinese satellite ass
 ## Project structure
 
 - `src/DevToys.CryptoTools/Cryptography`: cryptographic services.
-- `src/DevToys.CryptoTools/Tools`: six MEF-exported GUI tools.
+- `src/DevToys.CryptoTools/Tools`: seven MEF-exported GUI tools.
 - `src/DevToys.CryptoTools/Localization`: English resources and `Strings.zh-Hans.resx`.
 - `tests/DevToys.CryptoTools.Tests`: algorithm and plugin integration tests.
 

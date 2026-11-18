@@ -4,11 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.3.6</Version>
+    <Version>0.3.7</Version>
     <Title>DevToys CryptoTools</Title>
-    <Description>Key and certificate generators, RSA, elliptic curve and symmetric cryptography tools for DevToys.</Description>
+    <Description>Key, certificate and CRC generators, RSA, elliptic curve and symmetric cryptography tools for DevToys.</Description>
     <Authors>fnRice</Authors>
-    <PackageTags>devtoys-app;cryptography;rsa;ecdsa;aes</PackageTags>
+    <PackageTags>devtoys-app;cryptography;rsa;ecdsa;aes;crc</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
