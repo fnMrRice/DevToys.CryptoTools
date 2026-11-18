@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>0.3.4</Version>
+    <Version>0.3.5</Version>
     <Title>DevToys CryptoTools</Title>
     <Description>Key and certificate generators, RSA, elliptic curve and symmetric cryptography tools for DevToys.</Description>
     <Authors>fnRice</Authors>

@@ -10,13 +10,13 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 | Generators | Key generator | RSA 2048/3072/4096; ECDSA/ECDH NIST P-256/P-384/P-521, secp256k1, Brainpool P256r1/P384r1/P512r1; Ed25519/Ed448; X25519/X448; SM2; AES 128/192/256; ChaCha20; SM4 |
 | Generators | Certificate request generator | PKCS#10 CSR from generated or imported key pairs; subject, SAN and requested extensions |
 | Generators | Certificate generator | Self-signed or CA-issued X.509, including issuance from a verified CSR; RSA/RSA-PSS, ECDSA, Ed25519/Ed448 and SM2/SM3 |
-| Cryptography / 加解密 | RSA | OAEP SHA-256/384/512, PKCS#1 v1.5 encryption; PSS and PKCS#1 v1.5 signatures with SHA-256/384/512 |
+| Cryptography / 加解密 | RSA algorithms / RSA 算法 | OAEP SHA-256/384/512, PKCS#1 v1.5 encryption; PSS and PKCS#1 v1.5 signatures with SHA-256/384/512; PEM/Base64/Hex public keys, certificates or modulus/exponent |
 | Cryptography / 加解密 | Elliptic curve algorithms / 椭圆曲线算法 | Encrypt/decrypt with ECDH, X25519/X448 and SM2; sign/verify with ECDSA, Ed25519/Ed448 and SM2; public keys from PEM/Base64/Hex, certificates or X/Y coordinates |
 | Cryptography / 加解密 | Symmetric key algorithms / 对称密钥算法 | AES, SM4, Camellia, ARIA, Twofish, Serpent, Blowfish, CAST5, DES, TripleDES, RC2, ChaCha20, XChaCha20, Salsa20 and XSalsa20; compatible block/stream/AEAD modes |
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.4.nupkg` from `artifacts/`.
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.5.nupkg` from `artifacts/`.
 2. Restart DevToys. Key, certificate request and certificate tools appear under **Generators**; RSA, symmetric key algorithms and elliptic curve algorithms appear under **Cryptography** (加解密 in Chinese).
 3. Generate a key using the algorithm needed by your operation. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV; choose **Base64** when pasting a key from the key generator. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
@@ -29,6 +29,12 @@ The merged page uses two configuration columns and resizable side-by-side input/
 Public key data accepts **PEM / Base64 / Hex**. Base64 and Hex can encode SPKI DER, certificate DER or a raw public key: prime-curve SEC1 compressed/uncompressed points or X||Y, Ed25519/Ed448 raw public keys, and X25519/X448 raw public keys. Private material is rejected in public-key mode. Dropping a file resets its encoding to PEM.
 
 **X/Y coordinates** are also available for encryption or verification on the listed prime curves. Choose Hex or Base64 for unsigned big-endian coordinates; Hex accepts optional whitespace and `0x`. Coordinates are checked against the selected curve and subgroup. EdDSA/XDH use their standard encoded public keys instead of Cartesian input. The SM2 user ID appears only for SM2 signing/verification. **Use output as input** switches encryption to decryption; after signing, it switches to verification and transfers the signature while preserving the original message.
+
+## RSA algorithms
+
+The RSA page matches the elliptic curve layout: select **Encrypt / Decrypt / Sign / Verify** at the upper left, with public/private material at the upper right and resizable input/output below. Encryption/decryption show encryption padding; signing/verification show signature padding and hash. Only verification displays the signature input. **Use output as input** switches encryption to decryption, or transfers a generated signature into verification while preserving the message.
+
+For encryption and verification, choose **Key / certificate** or **Modulus / exponent (n/e)**. Public data accepts PEM, Base64 or Hex SPKI/PKCS#1 public keys or certificate DER. Modulus/exponent are unsigned big-endian integers in Hex or Base64; Hex permits optional whitespace and `0x`. Decryption/signing use a separate private key field supporting unencrypted PKCS#8 and PKCS#1 PEM/DER. File import uses the native drag/drop area and resets public data encoding to PEM. Certificates provide public keys only; private material and other key types are rejected as RSA public inputs.
 
 ## Certificate and CSR options
 
@@ -84,7 +90,7 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.4.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.5.nupkg
 ```
 
 Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
