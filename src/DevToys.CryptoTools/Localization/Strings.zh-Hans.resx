@@ -22,7 +22,12 @@
   <data name="SymKey" xml:space="preserve"><value>对称密钥（Base64）</value></data>
   <data name="KeyNote" xml:space="preserve"><value>本地生成密钥，请妥善保管好您的密钥对</value></data>
   <data name="KeyPassword" xml:space="preserve"><value>私钥密码（可选）</value></data>
-  <data name="KeyPasswordHint" xml:space="preserve"><value>填写密码以加密导出的私钥，留空则导出未加密的私钥。</value></data>
+  <data name="KeyPasswordHint" xml:space="preserve"><value>生成时使用此密码保护私钥，留空则生成未加密的私钥。</value></data>
+  <data name="KeyRsaSize" xml:space="preserve"><value>密钥长度（位）</value></data>
+  <data name="KeyCurve" xml:space="preserve"><value>曲线</value></data>
+  <data name="KeyPrivateOutput" xml:space="preserve"><value>私钥</value></data>
+  <data name="KeyPublicOutput" xml:space="preserve"><value>公钥</value></data>
+  <data name="KeyOutputFormatUnavailable" xml:space="preserve"><value>此密钥不支持该输出格式。</value></data>
   <data name="KeyExport" xml:space="preserve"><value>导出密钥对</value></data>
   <data name="KeyExportName" xml:space="preserve"><value>导出文件名（不含扩展名）</value></data>
   <data name="KeyExportNameDescription" xml:space="preserve"><value>导出时选择文件夹，私钥自动添加 .key 后缀，公钥自动添加 .pub 后缀。</value></data>

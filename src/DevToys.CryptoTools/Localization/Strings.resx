@@ -22,7 +22,12 @@
   <data name="SymKey" xml:space="preserve"><value>Symmetric key (Base64)</value></data>
   <data name="KeyNote" xml:space="preserve"><value>Keys are generated locally. Please keep your key pair safe.</value></data>
   <data name="KeyPassword" xml:space="preserve"><value>Private key password (optional)</value></data>
-  <data name="KeyPasswordHint" xml:space="preserve"><value>Enter a password to encrypt the exported private key, or leave empty for an unencrypted private key.</value></data>
+  <data name="KeyPasswordHint" xml:space="preserve"><value>Used when generating the private key. Leave empty to generate an unencrypted private key.</value></data>
+  <data name="KeyRsaSize" xml:space="preserve"><value>Key size (bits)</value></data>
+  <data name="KeyCurve" xml:space="preserve"><value>Curve</value></data>
+  <data name="KeyPrivateOutput" xml:space="preserve"><value>Private key</value></data>
+  <data name="KeyPublicOutput" xml:space="preserve"><value>Public key</value></data>
+  <data name="KeyOutputFormatUnavailable" xml:space="preserve"><value>This output format is unavailable for this key.</value></data>
   <data name="KeyExport" xml:space="preserve"><value>Export key pair</value></data>
   <data name="KeyExportName" xml:space="preserve"><value>Export file name (without extension)</value></data>
   <data name="KeyExportNameDescription" xml:space="preserve"><value>Choose a folder when exporting. The private key uses .key and the public key uses .pub.</value></data>

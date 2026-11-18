@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text;
 using DevToys.CryptoTools.UI;
 
@@ -145,11 +146,60 @@ public class KeyPairFileExportTests
     }
 
     [Fact]
-    public async Task SecondWriteFailureRollsBackBothFilesCreatedByThisExport()
+    public async Task TextEncodingFailureCreatesNoFiles()
     {
         using var directory = new TestDirectory();
         await Assert.ThrowsAsync<EncoderFallbackException>(() =>
             KeyPairFileExport.ExportAsync(directory.FullName, "keypair", PrivatePem, "\uD800").AsTask());
+        Assert.Empty(Directory.GetFileSystemEntries(directory.FullName));
+    }
+
+    [Fact]
+    public async Task BinaryExportWritesExactMemorySlicesWithoutChangingCallerBuffers()
+    {
+        using var directory = new TestDirectory();
+        byte[] privateBytes = [9, 0, 255, 1, 10, 9];
+        byte[] publicBytes = [9, 48, 130, 0, 254, 9];
+        await KeyPairFileExport.ExportAsync(directory.FullName, "binary", privateBytes.AsMemory(1, 4), publicBytes.AsMemory(1, 4));
+        Assert.Equal(new byte[] { 0, 255, 1, 10 }, await File.ReadAllBytesAsync(Path.Combine(directory.FullName, "binary.key")));
+        Assert.Equal(new byte[] { 48, 130, 0, 254 }, await File.ReadAllBytesAsync(Path.Combine(directory.FullName, "binary.pub")));
+        Assert.Equal(new byte[] { 9, 0, 255, 1, 10, 9 }, privateBytes);
+        Assert.Equal(new byte[] { 9, 48, 130, 0, 254, 9 }, publicBytes);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task BinaryExportRequiresBothNonemptyKeys(bool privateEmpty)
+    {
+        using var directory = new TestDirectory();
+        byte[] present = [1, 2, 3];
+        ReadOnlyMemory<byte> privateBytes = privateEmpty ? ReadOnlyMemory<byte>.Empty : present;
+        ReadOnlyMemory<byte> publicBytes = privateEmpty ? present : ReadOnlyMemory<byte>.Empty;
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            KeyPairFileExport.ExportAsync(directory.FullName, "binary", privateBytes, publicBytes).AsTask());
+        Assert.Empty(Directory.GetFileSystemEntries(directory.FullName));
+    }
+
+    [Fact]
+    public async Task BinaryExportConflictPreservesOriginalPublicBytesAndRollsBackNewPrivateFile()
+    {
+        using var directory = new TestDirectory();
+        string publicPath = Path.Combine(directory.FullName, "binary.pub");
+        await File.WriteAllBytesAsync(publicPath, [0, 1, 255]);
+        await Assert.ThrowsAsync<IOException>(() => KeyPairFileExport.ExportAsync(directory.FullName, "binary",
+            new byte[] { 1, 2, 3 }.AsMemory(), new byte[] { 4, 5, 6 }.AsMemory()).AsTask());
+        Assert.Equal(new byte[] { 0, 1, 255 }, await File.ReadAllBytesAsync(publicPath));
+        Assert.False(File.Exists(Path.Combine(directory.FullName, "binary.key")));
+    }
+
+    [Fact]
+    public async Task BinarySecondWriteFailureRollsBackBothFilesCreatedByThisExport()
+    {
+        using var directory = new TestDirectory();
+        using var failingMemory = new FailingMemory();
+        await Assert.ThrowsAsync<IOException>(() => KeyPairFileExport.ExportAsync(directory.FullName, "binary",
+            new byte[] { 1, 2, 3 }.AsMemory(), failingMemory.Bytes).AsTask());
         Assert.Empty(Directory.GetFileSystemEntries(directory.FullName));
     }
 
@@ -176,5 +226,14 @@ public class KeyPairFileExportTests
         private readonly DirectoryInfo _directory = Directory.CreateTempSubdirectory("DevToys.KeyPairExport.Tests-");
         internal string FullName => _directory.FullName;
         public void Dispose() => _directory.Delete(recursive: true);
+    }
+
+    private sealed class FailingMemory : MemoryManager<byte>
+    {
+        internal ReadOnlyMemory<byte> Bytes => CreateMemory(1);
+        public override Span<byte> GetSpan() => throw new IOException("Cannot access the public key buffer.");
+        public override MemoryHandle Pin(int elementIndex = 0) => throw new IOException("Cannot pin the public key buffer.");
+        public override void Unpin() { }
+        protected override void Dispose(bool disposing) { }
     }
 }

@@ -12,6 +12,26 @@ internal static class KeyPairFileExport
         if (string.IsNullOrWhiteSpace(privateKeyPem) || string.IsNullOrWhiteSpace(publicKeyPem))
             throw new ArgumentException(L("KeyExportMissingKeys"));
 
+        byte[] privateBytes = [];
+        byte[] publicBytes = [];
+        try
+        {
+            privateBytes = Utf8.GetBytes(privateKeyPem);
+            publicBytes = Utf8.GetBytes(publicKeyPem);
+            await ExportAsync(directory, baseName, privateBytes.AsMemory(), publicBytes.AsMemory()).ConfigureAwait(false);
+        }
+        finally
+        {
+            CryptographicOperations.ZeroMemory(privateBytes);
+            CryptographicOperations.ZeroMemory(publicBytes);
+        }
+    }
+
+    internal static async ValueTask ExportAsync(string directory, string baseName, ReadOnlyMemory<byte> privateBytes, ReadOnlyMemory<byte> publicBytes)
+    {
+        if (privateBytes.IsEmpty || publicBytes.IsEmpty)
+            throw new ArgumentException(L("KeyExportMissingKeys"));
+
         string outputDirectory = ValidateDirectory(directory);
         ValidateName(baseName);
         string privatePath = Path.Combine(outputDirectory, baseName + ".key");
@@ -24,8 +44,8 @@ internal static class KeyPairFileExport
             privateCreated = true;
             await using FileStream publicFile = CreateNew(publicPath);
             publicCreated = true;
-            await WritePemAsync(privateFile, privateKeyPem).ConfigureAwait(false);
-            await WritePemAsync(publicFile, publicKeyPem).ConfigureAwait(false);
+            await privateFile.WriteAsync(privateBytes).ConfigureAwait(false);
+            await publicFile.WriteAsync(publicBytes).ConfigureAwait(false);
         }
         catch
         {
@@ -83,13 +103,6 @@ internal static class KeyPairFileExport
         {
             throw new IOException(L("KeyExportFileExists"), error);
         }
-    }
-
-    private static async ValueTask WritePemAsync(Stream stream, string pem)
-    {
-        byte[] bytes = Utf8.GetBytes(pem);
-        try { await stream.WriteAsync(bytes.AsMemory()).ConfigureAwait(false); }
-        finally { CryptographicOperations.ZeroMemory(bytes); }
     }
 
     private static void TryDeleteCreated(string path)
