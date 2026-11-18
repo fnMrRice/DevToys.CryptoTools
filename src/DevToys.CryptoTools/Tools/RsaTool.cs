@@ -19,16 +19,16 @@ namespace DevToys.CryptoTools.Tools;
     AccessibleNameResourceName = "RsaTitle")]
 internal sealed class RsaTool : CryptoToolBase
 {
-    private readonly IUISelectDropDownList _operation = SelectDropDownList("rsa-operation").Title(L("Mode"))
+    private readonly IUISelectDropDownList _operation = SelectDropDownList("rsa-operation")
         .WithItems(new[] { "Encrypt", "Decrypt", "Sign", "Verify" }.Select(value => Item(L(value), value)).ToArray()).Select(0);
-    private readonly IUISelectDropDownList _padding = Options("rsa-encryption-padding", "Padding", RsaCryptography.EncryptionPaddings);
-    private readonly IUISelectDropDownList _hash = Options("rsa-hash", "Hash", RsaCryptography.Hashes);
-    private readonly IUISelectDropDownList _signaturePadding = Options("rsa-signature-padding", "SignaturePadding", RsaCryptography.SignaturePaddings);
-    private readonly IUISelectDropDownList _source = SelectDropDownList("rsa-public-source").Title(L("PublicKeySource"))
+    private readonly IUISelectDropDownList _padding = Options("rsa-encryption-padding", RsaCryptography.EncryptionPaddings);
+    private readonly IUISelectDropDownList _hash = Options("rsa-hash", RsaCryptography.Hashes);
+    private readonly IUISelectDropDownList _signaturePadding = Options("rsa-signature-padding", RsaCryptography.SignaturePaddings);
+    private readonly IUISelectDropDownList _source = SelectDropDownList("rsa-public-source")
         .WithItems(Item(L("KeyFileSource"), "key"), Item(L("RsaParameterSource"), "parameters")).Select(0);
     private readonly IUISelectDropDownList _publicEncoding = SelectDropDownList("rsa-public-encoding")
         .WithItems(Item("PEM", PublicKeyEncoding.Pem), Item("Base64", PublicKeyEncoding.Base64), Item("Hex", PublicKeyEncoding.Hex)).Select(0);
-    private readonly IUISelectDropDownList _parameterEncoding = SelectDropDownList("rsa-parameter-encoding").Title(L("RsaParameterEncoding"))
+    private readonly IUISelectDropDownList _parameterEncoding = SelectDropDownList("rsa-parameter-encoding")
         .WithItems(Item("Hex", PublicKeyEncoding.Hex), Item("Base64", PublicKeyEncoding.Base64)).Select(0);
     private readonly IUIMultiLineTextInput _modulus = MultiLineTextInput("rsa-modulus").Title(L("RsaModulus")).ShowCommandBar().Extendable();
     private readonly IUISingleLineTextInput _exponent = SingleLineTextInput("rsa-exponent").Title(L("RsaExponent")).ShowCommandBar();
@@ -39,12 +39,17 @@ internal sealed class RsaTool : CryptoToolBase
     private readonly KeyFileInput _privateKey;
     private readonly IUIElement _publicPanel;
     private readonly IUIElement _parameters;
+    private readonly IUISetting _paddingSetting;
+    private readonly IUISetting _signaturePaddingSetting;
+    private readonly IUISetting _hashSetting;
+    private readonly IUISetting _sourceSetting;
+    private readonly IUISetting _publicEncodingSetting;
+    private readonly IUISetting _parameterEncodingSetting;
     private readonly IUIGrid _inputPane;
     private readonly IUIButton _run;
     private readonly IUIButton _useOutput;
-    private readonly IUIGrid _layout;
+    private readonly IUIStack _layout;
 
-    protected override bool IsScrollable => false;
     protected override IUIElement BuildLayout() => _layout;
     private bool IsPublicOperation => Selected(_operation) is "Encrypt" or "Verify";
     private bool IsSigningOperation => Selected(_operation) is "Sign" or "Verify";
@@ -56,25 +61,37 @@ internal sealed class RsaTool : CryptoToolBase
             _publicEncoding.Select(0);
             Invalidate();
         }, L("RsaPublicImportHint"));
-        _publicKey.Editor.Title(L("PublicKeyMaterial")).CommandBarExtraContent(_publicEncoding);
+        _publicKey.Editor.Title(L("PublicKeyMaterial"));
         _privateKey = new KeyFileInput("rsa-private", ExecuteAsync, Invalidate, L("RsaPrivateImportHint"));
         _privateKey.Editor.Title(L("PrivateKey"));
-        _parameters = Stack("rsa-parameters").Vertical().SmallSpacing().WithChildren(_parameterEncoding,
-            Grid().Rows(new UIGridLength(110)).Cells(At(0, 0, _modulus)), _exponent);
-        _publicPanel = Stack("rsa-public-panel").Vertical().SmallSpacing().WithChildren(_source,
-            Grid().Cells(At(0, 0, _publicKey.View), At(0, 0, _parameters)));
-        var keyPanel = Grid("rsa-key-panel").Cells(At(0, 0, _publicPanel), At(0, 0, _privateKey.View));
-        var options = Stack().Vertical().MediumSpacing().WithChildren(_operation, _padding, _signaturePadding, _hash);
-        var configuration = Grid("rsa-configuration").Columns(Fraction(1), Fraction(1)).ColumnLargeSpacing().Cells(
-            At(0, 0, options.AlignVertically(UIVerticalAlignment.Top)), At(0, 1, keyPanel));
-        _inputPane = Grid("rsa-input-pane").Rows(Fraction(1), Auto).RowMediumSpacing().Cells(At(0, 0, _input), At(1, 0, _signature));
+        _parameters = Stack("rsa-parameters").Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top).WithChildren(
+            Grid().Rows(new UIGridLength(180)).AlignVertically(UIVerticalAlignment.Top).Cells(At(0, 0, _modulus)), _exponent);
+        _publicPanel = Stack("rsa-public-panel").Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(_publicKey.View, _parameters);
+        var keyPanel = Stack("rsa-key-panel").Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(_publicPanel, _privateKey.View);
+        _paddingSetting = Parameter("rsa-encryption-padding-setting", "Padding", _padding);
+        _signaturePaddingSetting = Parameter("rsa-signature-padding-setting", "SignaturePadding", _signaturePadding);
+        _hashSetting = Parameter("rsa-hash-setting", "Hash", _hash);
+        _sourceSetting = Parameter("rsa-public-source-setting", "PublicKeySource", _source);
+        _publicEncodingSetting = Parameter("rsa-public-encoding-setting", "PublicKeyEncoding", _publicEncoding);
+        _parameterEncodingSetting = Parameter("rsa-parameter-encoding-setting", "RsaParameterEncoding", _parameterEncoding);
+        var options = SettingGroup("rsa-parameter-settings").Title(L("CryptoParameters")).Description(L("RsaNote"))
+            .Icon("FluentSystemIcons", '\uE670').WithSettings(_paddingSetting, _signaturePaddingSetting, _hashSetting,
+                _sourceSetting, _publicEncodingSetting, _parameterEncodingSetting);
+        var configuration = Stack("rsa-configuration").Vertical().SmallSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(Parameter("rsa-operation-setting", "Mode", _operation), options);
+        _inputPane = Grid("rsa-input-pane").Rows(Fraction(1), Auto).RowNoSpacing()
+            .Cells(At(0, 0, _input), At(1, 0, _signature));
         var editors = SplitGrid("rsa-editors").Vertical().WithLeftPaneChild(_inputPane).WithRightPaneChild(_output);
+        var editorArea = Grid("rsa-editor-area").Rows(new UIGridLength(350)).AlignVertically(UIVerticalAlignment.Top)
+            .Cells(At(0, 0, editors));
         _run = CreateActionButton(L("Encrypt"), Run, "rsa-run").AccentAppearance();
         _useOutput = CreateActionButton(L("UseOutputAsInput"), UseOutputAsInput, "rsa-use-output");
         var actions = Stack().Horizontal().SmallSpacing().AlignHorizontally(UIHorizontalAlignment.Left).WithChildren(
             _run, _useOutput, CreateActionButton(L("Clear"), Clear, "rsa-clear"));
-        _layout = Grid("rsa-layout").Rows(Auto, Auto, Fraction(1), Auto).RowMediumSpacing().Cells(
-            At(0, 0, configuration), At(1, 0, actions), At(2, 0, editors), At(3, 0, Status));
+        _layout = Stack("rsa-layout").Vertical().MediumSpacing().AlignVertically(UIVerticalAlignment.Top)
+            .WithChildren(configuration, keyPanel, actions, editorArea, Status);
 
         _operation.OnItemSelected(_ => UpdateOperation());
         _source.OnItemSelected(_ => UpdateSource());
@@ -87,11 +104,15 @@ internal sealed class RsaTool : CryptoToolBase
 
     private void UpdateOperation()
     {
-        if (IsSigningOperation) { _padding.Hide(); _signaturePadding.Show(); _hash.Show(); }
-        else { _padding.Show(); _signaturePadding.Hide(); _hash.Hide(); }
+        SetVisible(_paddingSetting, _padding, !IsSigningOperation);
+        SetVisible(_signaturePaddingSetting, _signaturePadding, IsSigningOperation);
+        SetVisible(_hashSetting, _hash, IsSigningOperation);
         bool verify = Selected(_operation) == "Verify";
         if (verify) _signature.Show(); else _signature.Hide();
-        _inputPane.Rows(Fraction(2), verify ? Fraction(1) : Auto);
+        // This grid intentionally fills the bounded editor region. Equal rows
+        // leave enough room for both native editor headers and their minimum height.
+        _inputPane.Rows(Fraction(1), verify ? Fraction(1) : Auto);
+        if (verify) _inputPane.RowSmallSpacing(); else _inputPane.RowNoSpacing();
         _run.Text(L(Selected(_operation)));
         if (verify) _useOutput.Disable(); else _useOutput.Enable();
         UpdateSource();
@@ -99,13 +120,17 @@ internal sealed class RsaTool : CryptoToolBase
 
     private void UpdateSource()
     {
+        bool parameters = IsPublicOperation && Selected(_source) == "parameters";
+        SetVisible(_sourceSetting, _source, IsPublicOperation);
+        SetVisible(_publicEncodingSetting, _publicEncoding, IsPublicOperation && !parameters);
+        SetVisible(_parameterEncodingSetting, _parameterEncoding, parameters);
         if (IsPublicOperation)
         {
-            _publicPanel.Show(); _source.Show(); _privateKey.View.Hide();
-            if (Selected(_source) == "parameters") { _parameters.Show(); _publicKey.View.Hide(); }
+            _publicPanel.Show(); _privateKey.View.Hide();
+            if (parameters) { _parameters.Show(); _publicKey.View.Hide(); }
             else { _parameters.Hide(); _publicKey.View.Show(); }
         }
-        else { _publicPanel.Hide(); _source.Hide(); _parameters.Hide(); _privateKey.View.Show(); }
+        else { _publicPanel.Hide(); _parameters.Hide(); _privateKey.View.Show(); }
         Invalidate();
     }
 
@@ -144,7 +169,14 @@ internal sealed class RsaTool : CryptoToolBase
         _input.Text(""); _signature.Text(""); Invalidate();
     }
 
-    private static IUISelectDropDownList Options(string id, string title, string[] values) => SelectDropDownList(id)
-        .Title(L(title)).WithItems(values.Select(value => Item(value, value)).ToArray()).Select(0);
+    private static IUISelectDropDownList Options(string id, string[] values) => SelectDropDownList(id)
+        .WithItems(values.Select(value => Item(value, value)).ToArray()).Select(0);
+    private static IUISetting Parameter(string id, string title, IUIElement input) => Setting(id).Title(L(title))
+        .Icon("FluentSystemIcons", '\uE670').InteractiveElement(input);
+    private static void SetVisible(IUIElement setting, IUIElement input, bool visible)
+    {
+        if (visible) { setting.Show(); input.Show(); }
+        else { setting.Hide(); input.Hide(); }
+    }
     private static IUIGridCell At(int row, int column, IUIElement child) => Cell().Row(row).Column(column).WithChild(child);
 }

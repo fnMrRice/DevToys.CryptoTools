@@ -54,8 +54,8 @@ public class PluginTests
         var tool = new RsaTool();
         var encrypt = Assert.IsAssignableFrom<IUIButton>(tool.View.GetChildElementById("rsa-run"));
         await encrypt.OnClickAction!();
-        var root = Assert.IsAssignableFrom<IUIGrid>(tool.View.RootElement);
-        Assert.True(root.Cells!.Select(cell => cell.Child).OfType<IUIInfoBar>().Single().IsVisible);
+        var root = Assert.IsAssignableFrom<IUIStack>(tool.View.RootElement);
+        Assert.True(root.Children!.OfType<IUIInfoBar>().Single().IsVisible);
         Assert.Empty(Assert.IsAssignableFrom<IUIMultiLineTextInput>(tool.View.GetChildElementById("rsa-output")).Text);
     }
 }

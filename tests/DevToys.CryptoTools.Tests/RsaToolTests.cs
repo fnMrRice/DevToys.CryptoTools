@@ -15,8 +15,8 @@ public class RsaToolTests
     public void FourModesControlSourcesPaddingAndSignatureInputs()
     {
         var tool = new RsaTool();
-        Assert.False(tool.View.IsScrollable);
-        Assert.Equal(2, Find<IUIGrid>(tool, "rsa-configuration").Columns!.Length);
+        Assert.True(tool.View.IsScrollable);
+        Assert.Equal(UIOrientation.Vertical, Find<IUIStack>(tool, "rsa-configuration").Orientation);
         Assert.Equal(UIOrientation.Vertical, Find<IUISplitGrid>(tool, "rsa-editors").Orientation);
         Assert.Equal(4, Find<IUISelectDropDownList>(tool, "rsa-operation").Items!.Length);
         Assert.True(Find<IUISelectDropDownList>(tool, "rsa-encryption-padding").IsVisible);

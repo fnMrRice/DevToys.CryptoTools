@@ -249,4 +249,6 @@
   <data name="CrcDoesNotMatch" xml:space="preserve"><value>The checksums do not match.</value></data>
   <data name="CrcOr" xml:space="preserve"><value>or</value></data>
   <data name="CrcClearFile" xml:space="preserve"><value>Clear file</value></data>
+  <data name="CryptoParameters" xml:space="preserve"><value>Parameters</value></data>
+  <data name="PublicKeyEncoding" xml:space="preserve"><value>Public key encoding</value></data>
 </root>

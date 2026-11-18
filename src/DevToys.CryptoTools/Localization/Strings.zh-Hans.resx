@@ -249,4 +249,6 @@
   <data name="CrcDoesNotMatch" xml:space="preserve"><value>校验和不一致。</value></data>
   <data name="CrcOr" xml:space="preserve"><value>或</value></data>
   <data name="CrcClearFile" xml:space="preserve"><value>清除文件</value></data>
+  <data name="CryptoParameters" xml:space="preserve"><value>参数</value></data>
+  <data name="PublicKeyEncoding" xml:space="preserve"><value>公钥编码</value></data>
 </root>
