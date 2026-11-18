@@ -13,7 +13,7 @@
   <data name="RsaDescription" xml:space="preserve"><value>RSA encryption, decryption, signing and verification.</value></data>
   <data name="EcTitle" xml:space="preserve"><value>Elliptic curve cryptography</value></data>
   <data name="EcDescription" xml:space="preserve"><value>ECDSA, EdDSA and ECDH/XDH hybrid encryption.</value></data>
-  <data name="SymTitle" xml:space="preserve"><value>Symmetric encryption</value></data>
+  <data name="SymTitle" xml:space="preserve"><value>Symmetric key algorithms</value></data>
   <data name="SymDescription" xml:space="preserve"><value>Encrypt and decrypt using 15 block and stream algorithms with compatible modes and padding.</value></data>
   <data name="Algorithm" xml:space="preserve"><value>Algorithm</value></data>
   <data name="Generate" xml:space="preserve"><value>Generate</value></data>

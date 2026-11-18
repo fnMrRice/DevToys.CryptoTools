@@ -13,11 +13,11 @@ English is the default language; Simplified Chinese follows the DevToys UI cultu
 | Cryptography / 加解密 | RSA | OAEP SHA-256/384/512, PKCS#1 v1.5 encryption; PSS and PKCS#1 v1.5 signatures with SHA-256/384/512 |
 | Cryptography / 加解密 | Elliptic curve encryption | ECDH on all listed prime curves, X25519/X448 hybrid encryption; SM2 C1C3C2/C1C2C3 |
 | Cryptography / 加解密 | Elliptic curve signatures | ECDSA on all listed prime curves, Ed25519/Ed448 and SM2; key/certificate or X/Y coordinate verification |
-| Cryptography / 加解密 | Symmetric encryption | AES, SM4, Camellia, ARIA, Twofish, Serpent, Blowfish, CAST5, DES, TripleDES, RC2, ChaCha20, XChaCha20, Salsa20 and XSalsa20; compatible block/stream/AEAD modes |
+| Cryptography / 加解密 | Symmetric key algorithms / 对称密钥算法 | AES, SM4, Camellia, ARIA, Twofish, Serpent, Blowfish, CAST5, DES, TripleDES, RC2, ChaCha20, XChaCha20, Salsa20 and XSalsa20; compatible block/stream/AEAD modes |
 
 ## Install and try
 
-1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.2.nupkg` from `artifacts/`.
+1. Open **Manage extensions** in DevToys and install `DevToys.CryptoTools.0.3.3.nupkg` from `artifacts/`.
 2. Restart DevToys. Key, certificate request and certificate tools appear under **Generators**; RSA, symmetric and the two elliptic curve tools appear under **Cryptography** (加解密 in Chinese).
 3. Generate a key using the algorithm needed by your operation. Copy the public PEM key to encrypt/verify, or the private PEM key to decrypt/sign. The symmetric page defaults to **Hex** for both key and IV; choose **Base64** when pasting a key from the key generator. Text keys and IVs use their UTF-8 bytes directly, without password derivation.
 4. Encryption and signing accept UTF-8 text by default. On the symmetric page, input and output are side by side and each has a **Base64 / Hex / Text (UTF-8)** selector. **Use output as input** transfers the result and switches the encodings for decryption. To verify signatures, enter the original text in **Input** and the Base64 signature in **Signature**.
@@ -83,7 +83,7 @@ dotnet restore
 dotnet build -c Release --no-restore
 dotnet test -c Release --no-build
 dotnet pack src/DevToys.CryptoTools -c Release --no-build -o artifacts
-pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.2.nupkg
+pwsh -File scripts/Verify-Package.ps1 -PackagePath artifacts/DevToys.CryptoTools.0.3.3.nupkg
 ```
 
 Tests cover key import, certificate/CSR signatures, algorithm round trips, invalid key types, message limits, tampering, SM2 IDs, RFC 8032 and NIST vectors, MEF discovery, language fallback, symmetric page encodings, IV generation and button workflows. GitHub Actions runs the suite on Windows, Linux and macOS.
