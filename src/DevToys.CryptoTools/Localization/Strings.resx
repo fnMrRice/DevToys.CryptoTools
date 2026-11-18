@@ -56,4 +56,6 @@
   <data name="MessageTooLong" xml:space="preserve"><value>Message exceeds the RSA padding limit. Use hybrid encryption for larger messages.</value></data>
   <data name="Clear" xml:space="preserve"><value>Clear</value></data>
   <data name="InvalidUtf8" xml:space="preserve"><value>Decrypted data is not valid UTF-8.</value></data>
+  <data name="Sm2Id" xml:space="preserve"><value>SM2 user ID (UTF-8, signing and verification only)</value></data>
+  <data name="Sm2Note" xml:space="preserve"><value>SM2 uses sm2p256v1 and SM3. Encryption output is Base64 raw C1C3C2 or C1C2C3 (uncompressed C1), not a JSON envelope. Signing and verification must use the same user ID.</value></data>
 </root>

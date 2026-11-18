@@ -56,4 +56,6 @@
   <data name="MessageTooLong" xml:space="preserve"><value>消息超出 RSA 填充长度限制，请对较长消息使用混合加密。</value></data>
   <data name="Clear" xml:space="preserve"><value>清空</value></data>
   <data name="InvalidUtf8" xml:space="preserve"><value>解密数据不是有效的 UTF-8 文本。</value></data>
+  <data name="Sm2Id" xml:space="preserve"><value>SM2 用户 ID（UTF-8，仅用于签名与验签）</value></data>
+  <data name="Sm2Note" xml:space="preserve"><value>SM2 使用 sm2p256v1 曲线和 SM3。加密输出为原始 C1C3C2 或 C1C2C3 的 Base64（C1 为非压缩点），不是 JSON 密文。签名与验签必须使用相同的用户 ID。</value></data>
 </root>
