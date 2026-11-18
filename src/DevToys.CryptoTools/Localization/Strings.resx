@@ -9,7 +9,7 @@
   <data name="KeyDescription" xml:space="preserve"><value>Generate RSA, elliptic curve and symmetric keys.</value></data>
   <data name="CertTitle" xml:space="preserve"><value>Certificate generator</value></data>
   <data name="CertDescription" xml:space="preserve"><value>Generate configurable X.509 certificates, self-signed or issued from a CSR by a CA.</value></data>
-  <data name="RsaTitle" xml:space="preserve"><value>RSA</value></data>
+  <data name="RsaTitle" xml:space="preserve"><value>RSA algorithms</value></data>
   <data name="RsaDescription" xml:space="preserve"><value>RSA encryption, decryption, signing and verification.</value></data>
   <data name="EcTitle" xml:space="preserve"><value>Elliptic curve algorithms</value></data>
   <data name="EcDescription" xml:space="preserve"><value>Encrypt, decrypt, sign and verify with elliptic curve algorithms and PEM/Base64/Hex public keys.</value></data>
@@ -192,4 +192,10 @@
   <data name="CoordinateXValue" xml:space="preserve"><value>Public key X</value></data>
   <data name="CoordinateYValue" xml:space="preserve"><value>Public key Y</value></data>
   <data name="CoordinateEncodingHint" xml:space="preserve"><value>Unsigned big-endian coordinates in the selected encoding.</value></data>
+  <data name="RsaParameterSource" xml:space="preserve"><value>Modulus / exponent (n/e)</value></data>
+  <data name="RsaParameterEncoding" xml:space="preserve"><value>Parameter encoding</value></data>
+  <data name="RsaModulus" xml:space="preserve"><value>Public modulus (n)</value></data>
+  <data name="RsaExponent" xml:space="preserve"><value>Public exponent (e)</value></data>
+  <data name="RsaPublicImportHint" xml:space="preserve"><value>Drop an RSA public key or certificate, or enter PEM / Base64 / Hex public key data.</value></data>
+  <data name="RsaPrivateImportHint" xml:space="preserve"><value>Drop an unencrypted PKCS#8 / PKCS#1 RSA private key (PEM/DER), or paste PEM text.</value></data>
 </root>

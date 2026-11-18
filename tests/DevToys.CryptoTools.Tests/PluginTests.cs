@@ -52,11 +52,10 @@ public class PluginTests
     public async Task InvalidUserInputIsShownInTheToolWithoutEscapingTheButtonHandler()
     {
         var tool = new RsaTool();
-        var root = (IUIStack)tool.View.RootElement!;
-        Assert.NotNull(root.Children);
-        var encrypt = root.Children.OfType<IUIButton>().First();
+        var encrypt = Assert.IsAssignableFrom<IUIButton>(tool.View.GetChildElementById("rsa-run"));
         await encrypt.OnClickAction!();
-        Assert.True(root.Children.OfType<IUIInfoBar>().Single().IsVisible);
-        Assert.Empty(root.Children.OfType<IUIMultiLineTextInput>().Last().Text ?? "");
+        var root = Assert.IsAssignableFrom<IUIGrid>(tool.View.RootElement);
+        Assert.True(root.Cells!.Select(cell => cell.Child).OfType<IUIInfoBar>().Single().IsVisible);
+        Assert.Empty(Assert.IsAssignableFrom<IUIMultiLineTextInput>(tool.View.GetChildElementById("rsa-output")).Text);
     }
 }
